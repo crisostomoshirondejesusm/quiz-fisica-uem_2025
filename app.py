@@ -11,7 +11,7 @@ TEMPO_QUESTAO = 60
 TEMPO_TOTAL_EXAME = 90 * 60  # 1h30min em segundos
 
 # -------------------------------
-# BANCO DE QUESTÕES (Exemplo)
+# BANCO DE QUESTÕES COMPLETO
 # -------------------------------
 if "perguntas" not in st.session_state:
     st.session_state.perguntas = [
@@ -29,6 +29,11 @@ if "perguntas" not in st.session_state:
             "pergunta": "42) Um transmissor de rádio opera a 20 MHz. Qual é o comprimento de onda emitido?",
             "opcoes": ["A) 5 m", "B) 10 m", "C) 15 m", "D) 20 m", "E) 25 m"],
             "correta": "C"
+        },
+        {
+            "pergunta": "43) Um corpo de 1 kg absorve 1250 cal ao ser aquecido de 30 °C a 80 °C. O calor específico é:",
+            "opcoes": ["A) 0,025 cal/g°C", "B) 0,25 cal/g°C", "C) 1,25 cal/g°C", "D) 25 cal/g°C", "E) 150 cal/g°C"],
+            "correta": "B"
         }
     ]
 
@@ -62,93 +67,79 @@ if tempo_restante_global <= 0:
     st.session_state.quiz_finalizado = True
 
 # -------------------------------
-# INTERFACE DO USUÁRIO
+# INTERFACE DO QUIZ
 # -------------------------------
 st.title("📘 Quiz Física – UEM 2025")
 
 if not st.session_state.quiz_finalizado and st.session_state.i < len(st.session_state.perguntas):
     
-    # Exibição dos Tempos
+    # 1. Relógios e Progresso
     col_t1, col_t2 = st.columns(2)
     with col_t1:
         st.metric("⏳ Tempo Total (1h30)", f"{tempo_restante_global // 60}m {tempo_restante_global % 60}s")
     with col_t2:
-        cor_tempo = "normal" if tempo_restante_questao > 10 else "inverse"
-        st.metric("⏱️ Tempo da Questão", f"{tempo_restante_questao}s", delta_color=cor_tempo)
+        st.metric("⏱️ Tempo da Questão", f"{tempo_restante_questao}s")
     
-    # Barra de progresso visual do exame
-    progresso = tempo_decorrido_total / TEMPO_TOTAL_EXAME
-    st.progress(min(progresso, 1.0), text="Progresso do tempo total")
+    st.progress(min(tempo_decorrido_total / TEMPO_TOTAL_EXAME, 1.0))
 
-    # Lógica de Avanço Automático por tempo de questão
+    # Avanço automático se os 60s da questão acabarem
     if tempo_restante_questao <= 0:
-        st.warning("Tempo esgotado nesta questão! Pulando...")
-        time.sleep(1)
         st.session_state.i += 1
         st.session_state.inicio_questao = time.time()
         st.rerun()
 
     st.divider()
 
-    # Conteúdo da Questão
-    q = st.session_state.perguntas[st.session_state.i]
+    # 2. Exibição da Questão (TEXTO DA PERGUNTA)
+    q_atual = st.session_state.perguntas[st.session_state.i]
     
-    # Recuperar marcação prévia
-    index_atual = 0
+    st.subheader(f"Questão {st.session_state.i + 1}")
+    st.markdown(f"### {q_atual['pergunta']}") # Aqui exibe o texto da pergunta
+    
+    # Recuperar marcação anterior se o aluno voltou
+    index_salvo = 0
     if st.session_state.i in st.session_state.respostas_usuario:
-        letra_salva = st.session_state.respostas_usuario[st.session_state.i]
-        for idx, opt in enumerate(q["opcoes"]):
-            if opt.startswith(letra_salva):
-                index_atual = idx
+        letra = st.session_state.respostas_usuario[st.session_state.i]
+        for idx, opt in enumerate(q_atual["opcoes"]):
+            if opt.startswith(letra):
+                index_salvo = idx
 
-    resposta = st.radio(f"Questão {st.session_state.i + 1} de {len(st.session_state.perguntas)}:", 
-                        q["opcoes"], index=index_atual, key=f"radio_{st.session_state.i}")
+    resposta = st.radio("Escolha a opção correta:", q_atual["opcoes"], index=index_salvo, key=f"radio_{st.session_state.i}")
 
     st.write("")
 
-    # -------------------------------
-    # BOTÕES DE NAVEGAÇÃO (GRANDES)
-    # -------------------------------
-    
-    # Botão de Confirmar Resposta (Principal)
-    if st.button("✅ RESPONDER E AVANÇAR", use_container_width=True, type="primary"):
+    # 3. BOTÕES DE NAVEGAÇÃO GRANDES
+    # Botão de Confirmar (Ocupa a largura toda)
+    if st.button("✅ CONFIRMAR E AVANÇAR", use_container_width=True, type="primary"):
         st.session_state.respostas_usuario[st.session_state.i] = resposta[0]
         st.session_state.i += 1
-        st.session_state.inicio_questao = time.time() # Reseta o relógio para a próxima
+        st.session_state.inicio_questao = time.time()
         st.rerun()
 
-    # Coluna para Voltar e Pular
-    col_nav1, col_nav2 = st.columns(2)
-    with col_nav1:
-        # Botão Voltar (Desabilitado na primeira questão)
+    # Botões de Voltar e Pular
+    col_btn1, col_btn2 = st.columns(2)
+    with col_btn1:
         if st.button("⬅️ QUESTÃO ANTERIOR", use_container_width=True, disabled=(st.session_state.i == 0)):
             st.session_state.i -= 1
-            st.session_state.inicio_questao = time.time() # Reseta o relógio ao voltar
+            st.session_state.inicio_questao = time.time()
             st.rerun()
-            
-    with col_nav2:
+    with col_btn2:
         if st.button("PULAR QUESTÃO ➡️", use_container_width=True):
             st.session_state.i += 1
             st.session_state.inicio_questao = time.time()
             st.rerun()
 
-    # Botões de Utilidade (Sair/Reiniciar)
-    st.divider()
-    col_ut1, col_ut2 = st.columns(2)
-    with col_ut1:
-        if st.button("🔄 REINICIAR TUDO", use_container_width=True):
-            reiniciar()
-    with col_ut2:
-        if st.button("🚪 FINALIZAR AGORA", use_container_width=True):
-            st.session_state.quiz_finalizado = True
-            st.rerun()
+    # Botão de Sair
+    if st.button("🚪 FINALIZAR EXAME E VER RESULTADOS", use_container_width=True):
+        st.session_state.quiz_finalizado = True
+        st.rerun()
 
-    # Auto-refresh para o cronômetro
+    # Loop do cronômetro
     time.sleep(1)
     st.rerun()
 
 # -------------------------------
-# RESULTADOS
+# RESULTADOS FINAIS
 # -------------------------------
 else:
     st.success("🏁 EXAME FINALIZADO!")
@@ -161,8 +152,7 @@ else:
         if resp == q["correta"]:
             acertos += 1
             
-    st.balloons()
-    st.metric("Sua Pontuação Final", f"{acertos} / {total}")
+    st.metric("Sua Pontuação", f"{acertos} / {total}")
     
-    if st.button("Reiniciar Quiz", use_container_width=True):
+    if st.button("Reiniciar Exame", use_container_width=True):
         reiniciar()
