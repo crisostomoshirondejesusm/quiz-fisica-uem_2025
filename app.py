@@ -71,4 +71,97 @@ if not st.session_state.quiz_finalizado:
     tempo_restante_questao = max(0, TEMPO_QUESTAO_MAX - int(agora - st.session_state.inicio_questao))
 
     if tempo_restante_global <= 0:
-        final
+        finalizar_exame()
+        st.rerun()
+
+    # Exibição de cabeçalho
+    c1, c2 = st.columns(2)
+    with c1: st.metric("⏳ Tempo Global", f"{tempo_restante_global // 60}m {tempo_restante_global % 60}s")
+    with c2: st.metric("⏱️ Tempo Questão", f"{tempo_restante_questao}s")
+    
+    if tempo_restante_questao <= 0:
+        st.session_state.i += 1
+        st.session_state.inicio_questao = time.time()
+        st.rerun()
+
+    st.divider()
+
+    # Pergunta
+    q = st.session_state.perguntas[st.session_state.i]
+    st.write(f"### Questão {st.session_state.i + 1} / {len(st.session_state.perguntas)}")
+    st.markdown(f"#### {q['pergunta']}")
+
+    # Resposta anterior
+    idx_prev = 0
+    if st.session_state.i in st.session_state.respostas_usuario:
+        l = st.session_state.respostas_usuario[st.session_state.i]
+        for idx, o in enumerate(q["opcoes"]):
+            if o.startswith(l): idx_prev = idx
+
+    resp = st.radio("Sua resposta:", q["opcoes"], index=idx_prev, key=f"rad_{st.session_state.i}")
+
+    # Botões de navegação
+    if st.button("✅ CONFIRMAR E AVANÇAR", use_container_width=True, type="primary"):
+        st.session_state.respostas_usuario[st.session_state.i] = resp[0]
+        if st.session_state.i + 1 < len(st.session_state.perguntas):
+            st.session_state.i += 1
+            st.session_state.inicio_questao = time.time()
+        else:
+            finalizar_exame()
+        st.rerun()
+
+    col_v, col_p = st.columns(2)
+    with col_v:
+        if st.button("⬅️ VOLTAR", use_container_width=True, disabled=(st.session_state.i == 0)):
+            st.session_state.i -= 1
+            st.session_state.inicio_questao = time.time()
+            st.rerun()
+    with col_p:
+        if st.button("PULAR ➡️", use_container_width=True):
+            if st.session_state.i + 1 < len(st.session_state.perguntas):
+                st.session_state.i += 1
+                st.session_state.inicio_questao = time.time()
+            else:
+                finalizar_exame()
+            st.rerun()
+
+    time.sleep(1)
+    st.rerun()
+
+# -------------------------------
+# TELA FINAL
+# -------------------------------
+else:
+    st.success("🏁 EXAME FINALIZADO!")
+    
+    # Contagem de pontos
+    acertos = sum(1 for idx, q in enumerate(st.session_state.perguntas) if st.session_state.respostas_usuario.get(idx) == q["correta"])
+    
+    st.markdown("### 📊 Resultado para Captura")
+    c1, c2 = st.columns(2)
+    with c1: st.metric("✅ Pontos", f"{acertos} / {len(st.session_state.perguntas)}")
+    with c2: st.metric("⏱️ Tempo Gasto", st.session_state.get("tempo_total_gasto", "--"))
+    
+    # Botão de captura
+    screenshot_button()
+    st.divider()
+
+    # Gabarito
+    if not st.session_state.ver_correcao:
+        if st.button("🔍 VER GABARITO E CORREÇÃO", use_container_width=True):
+            st.session_state.ver_correcao = True
+            st.rerun()
+    else:
+        for idx, q in enumerate(st.session_state.perguntas):
+            r = st.session_state.respostas_usuario.get(idx, "N/A")
+            cor = "✅" if r == q["correta"] else "❌"
+            with st.expander(f"Questão {idx + 1}: {cor}"):
+                st.write(f"Sua resposta: {r} | Correta: {q['correta']}")
+        
+        if st.button("⬆️ OCULTAR GABARITO", use_container_width=True):
+            st.session_state.ver_correcao = False
+            st.rerun()
+
+    # Botão reiniciar (Garante o fechamento de tudo)
+    if st.button("🔄 REINICIAR TESTE", use_container_width=True):
+        reiniciar_tudo()
