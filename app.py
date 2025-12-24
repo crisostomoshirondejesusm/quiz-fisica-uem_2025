@@ -129,6 +129,7 @@ if st.session_state.i < len(perguntas):
     # mostra a contagem como no BOOM
     st.info(f"⏱️ Tempo restante: {tempo_restante}s")
 
+    # --- INÍCIO DO TRECHO SUBSTITUÍDO ---
     # quando chega a zero → passa para a próxima questão
     if tempo_restante <= 0:
         st.session_state.erradas.append(
@@ -144,7 +145,6 @@ if st.session_state.i < len(perguntas):
         key=st.session_state.i
     )
 
-
     if st.button("Responder / Avançar"):
         letra = resposta[0]
         if letra == q["correta"]:
@@ -157,9 +157,12 @@ if st.session_state.i < len(perguntas):
         st.session_state.inicio = time.time()
         st.experimental_rerun()
 
-    # força atualização a cada 1 segundo
-    time.sleep(1)
-    st.experimental_rerun()
+    # Atualiza automaticamente a cada 1 segundo, enquanto o usuário pensa
+    if tempo_restante > 0:
+        time.sleep(1)
+        st.experimental_rerun()
+    # --- FIM DO TRECHO SUBSTITUÍDO ---
+
 
 # -------------------------------
 # RESULTADO FINAL
