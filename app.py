@@ -120,10 +120,17 @@ st.write("⏱️ 90 segundos por questão")
 if st.session_state.i < len(perguntas):
     q = perguntas[st.session_state.i]
 
+    # tempo passado desde que a questão começou
     tempo_passado = int(time.time() - st.session_state.inicio)
-    restante = TEMPO_MAX - tempo_passado
 
-    if restante <= 0:
+    # contagem regressiva
+    tempo_restante = TEMPO_MAX - tempo_passado
+
+    # mostra a contagem como no BOOM
+    st.info(f"⏱️ Tempo restante: {tempo_restante}s")
+
+    # quando chega a zero → passa para a próxima questão
+    if tempo_restante <= 0:
         st.session_state.erradas.append(
             (q["pergunta"], "Sem resposta", q["correta"])
         )
@@ -131,13 +138,12 @@ if st.session_state.i < len(perguntas):
         st.session_state.inicio = time.time()
         st.experimental_rerun()
 
-    st.info(f"⏱️ Tempo restante: {restante}s")
-
     resposta = st.radio(
         q["pergunta"],
         q["opcoes"],
         key=st.session_state.i
     )
+
 
     if st.button("Responder / Avançar"):
         letra = resposta[0]
