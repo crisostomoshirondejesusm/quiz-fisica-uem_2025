@@ -2,21 +2,10 @@ import streamlit as st
 import time
 import streamlit.components.v1 as components
 
-# Configurações da Página
+# 1. Configurações Iniciais
 st.set_page_config(page_title="Exame Física UEM 2025", layout="centered")
 
-# Função de Captura de Tela (Abre a interface de captura/impressão do sistema)
-def screenshot_button():
-    if st.button("📸 FAZER CAPTURA DE TELA (PRINT)", use_container_width=True, type="primary"):
-        # JavaScript para abrir a ferramenta de captura/impressão do navegador
-        components.html("<script>window.print();</script>", height=0)
-
-# -------------------------------
-# BANCO DE QUESTÕES
-# -------------------------------
-TEMPO_QUESTAO_MAX = 60
-TEMPO_TOTAL_MAX = 90 * 60 
-
+# 2. Banco de Dados
 if "perguntas" not in st.session_state:
     st.session_state.perguntas = [
         {"pergunta": "40) Um recipiente com água é colocado sobre um fogão aceso. O aquecimento da água ocorre principalmente por:", "opcoes": ["A) Condução", "B) Irradiação", "C) Convecção", "D) Radiação", "E) Evaporação"], "correta": "C"},
@@ -32,136 +21,135 @@ if "perguntas" not in st.session_state:
         {"pergunta": "50) A radioatividade é consequência de:", "opcoes": ["A) Combustão química", "B) Alterações no núcleo dos átomos", "C) Escape de eletrões", "D) Ruptura de ligações químicas", "E) Variação de temperatura"], "correta": "B"}
     ]
 
-# -------------------------------
-# ESTADO DA SESSÃO
-# -------------------------------
-if "i" not in st.session_state:
-    st.session_state.i = 0
-    st.session_state.respostas_usuario = {}
-    st.session_state.inicio_global = time.time()
-    st.session_state.inicio_questao = time.time()
-    st.session_state.quiz_finalizado = False
-    st.session_state.ver_correcao = False 
+# 3. Inicialização de Estados (Session State)
+if "i" not in st.session_state: st.session_state.i = 0
+if "respostas_usuario" not in st.session_state: st.session_state.respostas_usuario = {}
+if "inicio_global" not in st.session_state: st.session_state.inicio_global = time.time()
+if "inicio_questao" not in st.session_state: st.session_state.inicio_questao = time.time()
+if "quiz_finalizado" not in st.session_state: st.session_state.quiz_finalizado = False
+if "ver_correcao" not in st.session_state: st.session_state.ver_correcao = False
 
-# FUNÇÃO REINICIAR CORRIGIDA
-def reiniciar_tudo():
-    # Limpamos todas as chaves manualmente para garantir o reset total
-    chaves_para_remover = ["i", "respostas_usuario", "inicio_global", "inicio_questao", "quiz_finalizado", "ver_correcao", "tempo_total_gasto"]
-    for chave in chaves_para_remover:
-        if chave in st.session_state:
-            del st.session_state[chave]
+# 4. Funções de Controle com Limpeza Real
+def reiniciar_totalmente():
+    # Limpa absolutamente todas as variáveis de controle
+    keys_to_reset = ["i", "respostas_usuario", "inicio_global", "inicio_questao", "quiz_finalizado", "ver_correcao", "tempo_total_texto"]
+    for key in keys_to_reset:
+        if key in st.session_state:
+            del st.session_state[key]
     st.rerun()
 
-def finalizar_exame():
-    agora = time.time()
-    gasto = int(agora - st.session_state.inicio_global)
-    st.session_state.tempo_total_gasto = f"{gasto // 60}m {gasto % 60}s"
+def finalizar():
+    gasto = int(time.time() - st.session_state.inicio_global)
+    st.session_state.tempo_total_texto = f"{gasto // 60}m {gasto % 60}s"
     st.session_state.quiz_finalizado = True
 
-# -------------------------------
-# EXECUÇÃO
-# -------------------------------
+# 5. Interface Principal
 st.title("📘 Quiz Física – UEM 2025")
 
 if not st.session_state.quiz_finalizado:
-    # Lógica de tempo e questões
+    # Lógica de Tempos
     agora = time.time()
-    tempo_decorrido = int(agora - st.session_state.inicio_global)
-    tempo_restante_global = max(0, TEMPO_TOTAL_MAX - tempo_decorrido)
-    tempo_restante_questao = max(0, TEMPO_QUESTAO_MAX - int(agora - st.session_state.inicio_questao))
+    total_restante = max(0, 5400 - int(agora - st.session_state.inicio_global))
+    questao_restante = max(0, 60 - int(agora - st.session_state.inicio_questao))
 
-    if tempo_restante_global <= 0:
-        finalizar_exame()
-        st.rerun()
+    if total_restante <= 0: finalizar(); st.rerun()
 
-    # Exibição de cabeçalho
     c1, c2 = st.columns(2)
-    with c1: st.metric("⏳ Tempo Global", f"{tempo_restante_global // 60}m {tempo_restante_global % 60}s")
-    with c2: st.metric("⏱️ Tempo Questão", f"{tempo_restante_questao}s")
-    
-    if tempo_restante_questao <= 0:
+    c1.metric("⏳ Tempo Exame", f"{total_restante // 60}m {total_restante % 60}s")
+    c2.metric("⏱️ Tempo Questão", f"{questao_restante}s")
+
+    if questao_restante <= 0:
         st.session_state.i += 1
         st.session_state.inicio_questao = time.time()
+        if st.session_state.i >= len(st.session_state.perguntas): finalizar()
         st.rerun()
 
     st.divider()
 
-    # Pergunta
-    q = st.session_state.perguntas[st.session_state.i]
-    st.write(f"### Questão {st.session_state.i + 1} / {len(st.session_state.perguntas)}")
-    st.markdown(f"#### {q['pergunta']}")
+    # Conteúdo da Questão
+    idx = st.session_state.i
+    q = st.session_state.perguntas[idx]
+    
+    st.write(f"### Questão {idx + 1} de {len(st.session_state.perguntas)}")
+    st.info(q['pergunta'])
 
-    # Resposta anterior
-    idx_prev = 0
-    if st.session_state.i in st.session_state.respostas_usuario:
-        l = st.session_state.respostas_usuario[st.session_state.i]
-        for idx, o in enumerate(q["opcoes"]):
-            if o.startswith(l): idx_prev = idx
+    # Recuperação de resposta
+    marcada = st.session_state.respostas_usuario.get(idx, None)
+    idx_radio = 0
+    if marcada:
+        for i_opt, t_opt in enumerate(q['opcoes']):
+            if t_opt.startswith(marcada): idx_radio = i_opt
 
-    resp = st.radio("Sua resposta:", q["opcoes"], index=idx_prev, key=f"rad_{st.session_state.i}")
+    escolha = st.radio("Selecione:", q['opcoes'], index=idx_radio, key=f"q_{idx}")
 
-    # Botões de navegação
+    # Botões de Navegação
     if st.button("✅ CONFIRMAR E AVANÇAR", use_container_width=True, type="primary"):
-        st.session_state.respostas_usuario[st.session_state.i] = resp[0]
-        if st.session_state.i + 1 < len(st.session_state.perguntas):
+        st.session_state.respostas_usuario[idx] = escolha[0]
+        if idx + 1 < len(st.session_state.perguntas):
             st.session_state.i += 1
             st.session_state.inicio_questao = time.time()
         else:
-            finalizar_exame()
+            finalizar()
         st.rerun()
 
     col_v, col_p = st.columns(2)
     with col_v:
-        if st.button("⬅️ VOLTAR", use_container_width=True, disabled=(st.session_state.i == 0)):
+        if st.button("⬅️ VOLTAR", use_container_width=True, disabled=(idx == 0)):
             st.session_state.i -= 1
             st.session_state.inicio_questao = time.time()
             st.rerun()
     with col_p:
         if st.button("PULAR ➡️", use_container_width=True):
-            if st.session_state.i + 1 < len(st.session_state.perguntas):
+            if idx + 1 < len(st.session_state.perguntas):
                 st.session_state.i += 1
                 st.session_state.inicio_questao = time.time()
             else:
-                finalizar_exame()
+                finalizar()
             st.rerun()
 
     time.sleep(1)
     st.rerun()
 
-# -------------------------------
-# TELA FINAL
-# -------------------------------
+# --- TELA DE RESULTADOS ---
 else:
     st.success("🏁 EXAME FINALIZADO!")
     
-    # Contagem de pontos
-    acertos = sum(1 for idx, q in enumerate(st.session_state.perguntas) if st.session_state.respostas_usuario.get(idx) == q["correta"])
-    
-    st.markdown("### 📊 Resultado para Captura")
-    c1, c2 = st.columns(2)
-    with c1: st.metric("✅ Pontos", f"{acertos} / {len(st.session_state.perguntas)}")
-    with c2: st.metric("⏱️ Tempo Gasto", st.session_state.get("tempo_total_gasto", "--"))
-    
-    # Botão de captura
-    screenshot_button()
+    acertos = sum(1 for i_q, quest in enumerate(st.session_state.perguntas) if st.session_state.respostas_usuario.get(i_q) == quest['correta'])
+
+    # Área de Impressão / Print
+    st.markdown("### 📊 Resultado Final")
+    res1, res2 = st.columns(2)
+    res1.metric("✅ Pontuação", f"{acertos} / {len(st.session_state.perguntas)}")
+    res2.metric("⏱️ Tempo Gasto", st.session_state.get('tempo_total_texto', '--'))
+
+    # BOTÃO DE CAPTURA (PRINT SCREEN)
+    if st.button("📸 FAZER CAPTURA DE TELA", use_container_width=True, type="primary"):
+        # Aciona o comando de impressão do sistema, que permite capturar a página toda ou salvar PDF
+        components.html("<script>window.print();</script>", height=0)
+
     st.divider()
 
-    # Gabarito
+    # Bloco de Correção (Inicia Fechado)
     if not st.session_state.ver_correcao:
-        if st.button("🔍 VER GABARITO E CORREÇÃO", use_container_width=True):
+        if st.button("🔍 EXIBIR GABARITO E CORREÇÃO", use_container_width=True):
             st.session_state.ver_correcao = True
             st.rerun()
     else:
-        for idx, q in enumerate(st.session_state.perguntas):
-            r = st.session_state.respostas_usuario.get(idx, "N/A")
-            cor = "✅" if r == q["correta"] else "❌"
-            with st.expander(f"Questão {idx + 1}: {cor}"):
-                st.write(f"Sua resposta: {r} | Correta: {q['correta']}")
+        st.markdown("### 📝 Correção Detalhada")
+        for i_q, quest in enumerate(st.session_state.perguntas):
+            resp = st.session_state.respostas_usuario.get(i_q, "PULADA")
+            corr = quest['correta']
+            st.write(f"**Q{i_q+1}:** {quest['pergunta']}")
+            if resp == corr:
+                st.write(f"Resposta: :green[{resp} (Correta)]")
+            else:
+                st.write(f"Resposta: :red[{resp}] | Correta: :green[{corr}]")
+            st.write("---")
         
-        if st.button("⬆️ OCULTAR GABARITO", use_container_width=True):
+        if st.button("⬆️ ESCONDER GABARITO", use_container_width=True):
             st.session_state.ver_correcao = False
             st.rerun()
 
-    # Botão reiniciar (Garante o fechamento de tudo)
-    if st.button("🔄 REINICIAR TESTE", use_container_width=True):
-        reiniciar_tudo()
+    # O BOTÃO REINICIAR CHAMA A FUNÇÃO DE LIMPEZA TOTAL
+    if st.button("🔄 REINICIAR TESTE DO ZERO", use_container_width=True):
+        reiniciar_totalmente()
