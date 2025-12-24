@@ -24,7 +24,7 @@ perguntas = [
         "correta": "B"
     },
     {
-        "pergunta": "42) Um transmissor de rádio opera a 20 MHz. Qual é o comprimento de onda emitido? (c = 3×10⁸ m/s)",
+        "pergunta": "42) Um transmissor de rádio opera a 20 MHz. Qual é o comprimento de onda emitido?",
         "opcoes": ["A) 5 m", "B) 10 m", "C) 15 m", "D) 20 m", "E) 25 m"],
         "correta": "C"
     },
@@ -120,27 +120,40 @@ st.write("⏱️ 90 segundos por questão")
 if st.session_state.i < len(perguntas):
     q = perguntas[st.session_state.i]
 
-    tempo = int(time.time() - st.session_state.inicio)
-    restante = max(0, TEMPO_MAX - tempo)
-    st.info(f"Tempo restante: {restante}s")
+    tempo_passado = int(time.time() - st.session_state.inicio)
+    restante = TEMPO_MAX - tempo_passado
 
-    resposta = st.radio(q["pergunta"], q["opcoes"])
+    if restante <= 0:
+        st.session_state.erradas.append(
+            (q["pergunta"], "Sem resposta", q["correta"])
+        )
+        st.session_state.i += 1
+        st.session_state.inicio = time.time()
+        st.experimental_rerun()
+
+    st.info(f"⏱️ Tempo restante: {restante}s")
+
+    resposta = st.radio(
+        q["pergunta"],
+        q["opcoes"],
+        key=st.session_state.i
+    )
 
     if st.button("Responder / Avançar"):
         letra = resposta[0]
         if letra == q["correta"]:
             st.session_state.pontos += 1
         else:
-            st.session_state.erradas.append((q["pergunta"], letra, q["correta"]))
+            st.session_state.erradas.append(
+                (q["pergunta"], letra, q["correta"])
+            )
         st.session_state.i += 1
         st.session_state.inicio = time.time()
         st.experimental_rerun()
 
-    if restante == 0:
-        st.session_state.erradas.append((q["pergunta"], "Sem resposta", q["correta"]))
-        st.session_state.i += 1
-        st.session_state.inicio = time.time()
-        st.experimental_rerun()
+    # força atualização a cada 1 segundo
+    time.sleep(1)
+    st.experimental_rerun()
 
 # -------------------------------
 # RESULTADO FINAL
@@ -150,11 +163,13 @@ else:
     st.write(f"✅ Pontos ganhos: {st.session_state.pontos}")
     st.write(f"❌ Pontos perdidos: {len(st.session_state.erradas)}")
 
-    st.subheader("❌ Correções")
-    for p, r, c in st.session_state.erradas:
-        st.write(f"**{p}**")
-        st.write(f"Sua resposta: {r}")
-        st.write(f"Correta: {c}")
-        st.markdown("---")
+    if st.session_state.erradas:
+        st.subheader("❌ Correções")
+        for p, r, c in st.session_state.erradas:
+            st.write(f"**{p}**")
+            st.write(f"Sua resposta: {r}")
+            st.write(f"Correta: {c}")
+            st.markdown("---")
 
     st.info("📸 Tire print da tela e envie no grupo do WhatsApp.")
+
