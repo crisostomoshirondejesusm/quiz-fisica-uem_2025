@@ -135,20 +135,21 @@ if not st.session_state.quiz_fim:
     # Cabeçalho de Status
     t_global = max(0, 10800 - int(time.time() - st.session_state.inicio_t))
     c1, c2, c3 = st.columns(3)
-    c1.metric("⏳ Total", f"{t_global//60}m")
+    c1.metric("⏳ Total", f"{t_global//60}m {t_global%60}s")
+
     c2.metric("📊 Questão", f"{st.session_state.i + 1}/80")
     c3.progress((st.session_state.i + 1)/80)
 
     st.divider()
 
     # ⏱️ CRONÓMETRO DA QUESTÃO (ADICIONADO)
-    tempo_passado = int(time.time() - st.session_state.quest_t)
-    tempo_restante = TEMPO_QUESTAO - tempo_passado
+tempo_passado = time.time() - st.session_state.quest_t
+tempo_restante = int(TEMPO_QUESTAO - tempo_passado)
 
+if tempo_restante <= 0:
+    proxima_questao()
+else:
     st.warning(f"⏱️ Tempo da questão: {tempo_restante}s")
-
-    if tempo_restante <= 0:
-        proxima_questao()
 
     # Conteúdo da Questão
     q = st.session_state.perguntas[st.session_state.i]
@@ -193,8 +194,8 @@ if not st.session_state.quiz_fim:
         if st.button("PULAR ➡️", use_container_width=True):
             proxima_questao()
 
-    time.sleep(1)
-    st.rerun()
+    #time.sleep(1)
+    #st.rerun()
 
 else:
     st.success("🏁 EXAME CONCLUÍDO!")
