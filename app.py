@@ -6,7 +6,7 @@ import os
 # 1. Configurações da Página
 st.set_page_config(page_title="Exame Unificado UEM 2025", layout="centered")
 
-# 2. Banco de Dados Completo (80 questões intercaladas)
+# 2. Banco de Dados Completo
 if "perguntas" not in st.session_state:
     # --- MATEMÁTICA (1 a 40) ---
     m_qs = [
@@ -96,7 +96,7 @@ if "perguntas" not in st.session_state:
         {"id": 80, "p": "Valor da amplitude de aceleração do corpo no gráfico MHS?", "opts": ["A. pi²", "B. 2pi²", "C. 3pi²", "D. 4pi²", "E. 5pi²"], "c": "B", "img": "q80.png"}
     ]
 
-    # Mesclagem Intercalada (M1, F41, M2, F42...)
+    # Mesclagem Intercalada
     final_list = []
     for m, f in zip(m_qs, f_qs):
         final_list.append(m)
@@ -110,6 +110,7 @@ if "quiz_fim" not in st.session_state: st.session_state.quiz_fim = False
 if "ver_gabarito" not in st.session_state: st.session_state.ver_gabarito = False
 if "inicio_t" not in st.session_state: st.session_state.inicio_t = time.time()
 if "quest_t" not in st.session_state: st.session_state.quest_t = time.time()
+if "fim_t" not in st.session_state: st.session_state.fim_t = 0
 
 def proxima_questao():
     if st.session_state.i + 1 < len(st.session_state.perguntas):
@@ -117,19 +118,31 @@ def proxima_questao():
         st.session_state.quest_t = time.time()
     else:
         st.session_state.quiz_fim = True
+        st.session_state.fim_t = time.time()
     st.rerun()
 
 # 4. Interface Principal
 st.title("📚 Exame Integrado UEM 2025")
-st.markdown("### Matemática I & Física I")
 
 if not st.session_state.quiz_fim:
+    # Lógica de Tempo por Questão (90s)
+    tempo_passado_quest = int(time.time() - st.session_state.quest_t)
+    tempo_restante_quest = max(0, 90 - tempo_passado_quest)
+    
+    # Lógica de Tempo Global (Crescente)
+    tempo_total_decorrido = int(time.time() - st.session_state.inicio_t)
+
     # Cabeçalho de Status
-    t_global = max(0, 10800 - int(time.time() - st.session_state.inicio_t)) # 3 horas
     c1, c2, c3 = st.columns(3)
-    c1.metric("⏳ Total", f"{t_global//60}m")
-    c2.metric("📊 Questão", f"{st.session_state.i + 1}/80")
-    c3.progress((st.session_state.i + 1)/80)
+    c1.metric("⏱️ Global", f"{tempo_total_decorrido // 60}m {tempo_total_decorrido % 60}s")
+    c2.metric("⏳ Questão", f"{tempo_restante_quest}s")
+    c3.progress((st.session_state.i + 1) / 80)
+
+    # Auto-passar se o tempo acabar
+    if tempo_restante_quest <= 0:
+        st.warning("Tempo esgotado para esta questão! Passando para a próxima...")
+        time.sleep(1)
+        proxima_questao()
 
     st.divider()
 
@@ -139,7 +152,6 @@ if not st.session_state.quiz_fim:
     st.info(f"**Matéria:** {tipo}")
 
     if q["img"]:
-        # Tenta carregar a imagem se existir na pasta imagens/
         img_path = f"imagens/{q['img']}"
         if os.path.exists(img_path):
             st.image(img_path, use_container_width=True)
@@ -149,7 +161,7 @@ if not st.session_state.quiz_fim:
     st.markdown(f"#### Questão {q['id']}")
     st.write(q['p'])
 
-    # Lógica de seleção (preservar resposta ao voltar)
+    # Lógica de seleção
     marcada = st.session_state.respostas.get(st.session_state.i, None)
     idx_radio = 0
     if marcada:
@@ -167,24 +179,29 @@ if not st.session_state.quiz_fim:
     with col_v:
         if st.button("⬅️ VOLTAR", use_container_width=True, disabled=(st.session_state.i == 0)):
             st.session_state.i -= 1
+            st.session_state.quest_t = time.time()
             st.rerun()
     with col_p:
         if st.button("PULAR ➡️", use_container_width=True):
             proxima_questao()
 
-    time.sleep(1) # Refresh para cronômetro
+    # Refresh automático para os segundos passarem
+    time.sleep(1)
     st.rerun()
 
 else:
     # Fim do Exame
+    duracao_total = int(st.session_state.fim_t - st.session_state.inicio_t)
     st.success("🏁 EXAME CONCLUÍDO!")
+    
     acertos = sum(1 for i, q in enumerate(st.session_state.perguntas) if st.session_state.respostas.get(i) == q["c"])
     nota = (acertos / 80) * 20
     
     st.balloons()
-    res_c1, res_c2 = st.columns(2)
+    res_c1, res_c2, res_c3 = st.columns(3)
     res_c1.metric("Total Acertos", f"{acertos} / 80")
     res_c2.metric("Nota Final", f"{nota:.1f} / 20")
+    res_c3.metric("Tempo Total", f"{duracao_total // 60}m {duracao_total % 60}s")
 
     if st.button("🔄 REINICIAR TUDO", use_container_width=True):
         for key in list(st.session_state.keys()): del st.session_state[key]
