@@ -1,9 +1,27 @@
 import streamlit as st
 import time
+import streamlit.components.v1 as components
 import os
 
 # 1. Configurações da Página
 st.set_page_config(page_title="Exame Unificado UEM 2025", layout="centered")
+
+# Estilo para o Relógio Digital
+st.markdown("""
+    <style>
+    .relogio-container {
+        display: flex;
+        justify-content: space-around;
+        background-color: #f0f2f6;
+        padding: 15px;
+        border-radius: 10px;
+        border: 2px solid #ff4b4b;
+        margin-bottom: 20px;
+    }
+    .tempo-label { font-size: 0.8rem; color: #555; margin-bottom: 5px; }
+    .tempo-valor { font-size: 1.5rem; font-weight: bold; font-family: 'Courier New', Courier, monospace; color: #ff4b4b; }
+    </style>
+    """, unsafe_allow_html=True)
 
 # 2. Banco de Dados Completo
 if "perguntas" not in st.session_state:
@@ -51,6 +69,7 @@ if "perguntas" not in st.session_state:
         {"id": 40, "p": "Qual é o resultado do produto $(3 - 2i) \cdot (-4 + i)$ no conjunto dos complexos?", "opts": ["A. 10+2i", "B. 11i", "C. -12-2i", "D. -10+11i", "E. -10"], "c": "D", "img": None}
     ]
 
+    # --- FÍSICA (41 a 80) ---
     f_qs = [
         {"id": 41, "p": "Um recipiente de vidro está quase cheio com água em temperatura ambiente. Ao colocá-lo sobre uma chama de fogão, a água começa a se aquecer por:", "opts": ["A. Condução", "B. irradiação", "C. convecção", "D. condução e convecção", "E. convecção e irradiação"], "c": "C", "img": None},
         {"id": 42, "p": "Quais são as características capazes de distinguir um tipo de onda electromagnética de outro?", "opts": ["A. intensidade, velocidade, área, comprimento", "B. amplitude, velocidade da propagação, frequência, comprimento de onda", "C. amplitude, polarização, frequência, direcção", "D. altura, intensidade, timbre, velocidade", "E. amplitude, perturbação, propagação"], "c": "B", "img": None},
@@ -94,6 +113,7 @@ if "perguntas" not in st.session_state:
         {"id": 80, "p": "Valor da amplitude de aceleração do corpo no gráfico MHS?", "opts": ["A. pi²", "B. 2pi²", "C. 3pi²", "D. 4pi²", "E. 5pi²"], "c": "B", "img": "q80.png"}
     ]
 
+    # Mesclagem Intercalada
     final_list = []
     for m, f in zip(m_qs, f_qs):
         final_list.append(m)
@@ -107,6 +127,7 @@ if "quiz_fim" not in st.session_state: st.session_state.quiz_fim = False
 if "ver_gabarito" not in st.session_state: st.session_state.ver_gabarito = False
 if "inicio_t" not in st.session_state: st.session_state.inicio_t = time.time()
 if "quest_t" not in st.session_state: st.session_state.quest_t = time.time()
+if "fim_t" not in st.session_state: st.session_state.fim_t = 0
 
 def proxima_questao():
     if st.session_state.i + 1 < len(st.session_state.perguntas):
@@ -118,27 +139,38 @@ def proxima_questao():
     st.rerun()
 
 # 4. Interface Principal
-st.title("📚 Exame Integrado UEM 2025")
-
 if not st.session_state.quiz_fim:
-    # 5. GERENCIAMENTO DE TEMPO (90s por questão e Global)
-    @st.fragment(run_every=1.0)
-    def mostrar_tempo():
-        tempo_q = int(time.time() - st.session_state.quest_t)
-        tempo_g = int(time.time() - st.session_state.inicio_t)
-        restante_q = max(0, 90 - tempo_q)
-        
-        c1, c2, c3 = st.columns(3)
-        c1.metric("⏱️ Tempo Global", f"{tempo_g // 60}m {tempo_g % 60}s")
-        c2.metric("⏳ Restante Questão", f"{restante_q}s")
-        c3.metric("📊 Questão", f"{st.session_state.i + 1}/80")
-        
-        if restante_q == 0:
-            st.warning("Tempo esgotado! Mudando...")
-            time.sleep(1)
-            proxima_questao()
+    # Cálculos de tempo
+    t_quest_decorrido = int(time.time() - st.session_state.quest_t)
+    t_quest_restante = max(0, 90 - t_quest_decorrido)
+    
+    t_global_decorrido = int(time.time() - st.session_state.inicio_t)
+    min_g, seg_g = divmod(t_global_decorrido, 60)
 
-    mostrar_tempo()
+    # EXIBIÇÃO DO RELÓGIO NA TELA
+    st.markdown(f"""
+        <div class="relogio-container">
+            <div style="text-align: center;">
+                <div class="tempo-label">TEMPO GLOBAL</div>
+                <div class="tempo-valor">{min_g:02d}:{seg_g:02d}</div>
+            </div>
+            <div style="text-align: center;">
+                <div class="tempo-label">ESTA QUESTÃO</div>
+                <div class="tempo-valor">{t_quest_restante:02d}s</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # Progress bar discreta
+    st.progress((st.session_state.i + 1) / 80)
+    st.write(f"**Questão {st.session_state.i + 1} de 80**")
+
+    # Auto-passar se o tempo acabar
+    if t_quest_restante <= 0:
+        st.error("Tempo esgotado! Mudando de questão...")
+        time.sleep(1)
+        proxima_questao()
+
     st.divider()
 
     # Conteúdo da Questão
@@ -156,16 +188,14 @@ if not st.session_state.quiz_fim:
     st.markdown(f"#### Questão {q['id']}")
     st.write(q['p'])
 
-    # Lógica de seleção
     marcada = st.session_state.respostas.get(st.session_state.i, None)
     idx_radio = 0
     if marcada:
         for idx, opt in enumerate(q["opts"]):
             if opt.startswith(marcada): idx_radio = idx
 
-    escolha = st.radio("Sua escolha:", q["opts"], index=idx_radio, key=f"radio_q_{st.session_state.i}")
+    escolha = st.radio("Sua escolha:", q["opts"], index=idx_radio, key=f"q_{st.session_state.i}")
 
-    # Botões
     if st.button("✅ SALVAR E CONTINUAR", use_container_width=True, type="primary"):
         st.session_state.respostas[st.session_state.i] = escolha[0]
         proxima_questao()
@@ -180,9 +210,14 @@ if not st.session_state.quiz_fim:
         if st.button("PULAR ➡️", use_container_width=True):
             proxima_questao()
 
+    time.sleep(1)
+    st.rerun()
+
 else:
-    # 6. TELA FINAL COM TEMPO TOTAL
-    tempo_total_exame = int(st.session_state.fim_t - st.session_state.inicio_t)
+    # Fim do Exame
+    duracao_total = int(st.session_state.fim_t - st.session_state.inicio_t)
+    min_tot, seg_tot = divmod(duracao_total, 60)
+    
     st.success("🏁 EXAME CONCLUÍDO!")
     
     acertos = sum(1 for i, q in enumerate(st.session_state.perguntas) if st.session_state.respostas.get(i) == q["c"])
@@ -192,7 +227,7 @@ else:
     res_c1, res_c2, res_c3 = st.columns(3)
     res_c1.metric("Total Acertos", f"{acertos} / 80")
     res_c2.metric("Nota Final", f"{nota:.1f} / 20")
-    res_c3.metric("Tempo Total", f"{tempo_total_exame // 60}min {tempo_total_exame % 60}s")
+    res_c3.metric("Tempo Total", f"{min_tot}m {seg_tot}s")
 
     if st.button("🔄 REINICIAR TUDO", use_container_width=True):
         for key in list(st.session_state.keys()): del st.session_state[key]
