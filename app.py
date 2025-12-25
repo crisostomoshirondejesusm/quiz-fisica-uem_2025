@@ -11,7 +11,7 @@ if "perguntas" not in st.session_state:
     # --- MATEMÁTICA (1 a 40) ---
     m_qs = [
         {"id": 1, "p": "Indique as soluções da equação $-|x-2|+6=2$:", "opts": ["A. x=2 v x=6", "B. x=-4 v x=4", "C. x=2", "D. x=-2 v x=6", "E. x=4"], "c": "D", "img": None},
-    	{"id": 2, "p": "Dizemos que $|x|>3$ se:", "opts": ["A. x ∈ ]-∞,-3[ ∪ ]3,+∞[", "B. x ∈ R", "C. x ∈ ]-3,3[", "D. x ∈ ]-∞,-3] ∪ [3,+∞[", "E. x ∈ ]3,+∞["], "c": "A", "img": None},
+        {"id": 2, "p": "Dizemos que $|x|>3$ se:", "opts": ["A. x ∈ ]-∞,-3[ ∪ ]3,+∞[", "B. x ∈ R", "C. x ∈ ]-3,3[", "D. x ∈ ]-∞,-3] ∪ [3,+∞[", "E. x ∈ ]3,+∞["], "c": "A", "img": None},
         {"id": 3, "p": "O conjunto dos números reais que se encontra a uma distância igual ou inferior a 3/2 do número π é dado por:", "opts": ["A. x - 3/2 = π", "B. |x - π| ≤ 3/2", "C. |x - 3/2| ≤ π", "D. x + 3/2 ≥ π", "E. x ≤ 3/2"], "c": "B", "img": None},
         {"id": 4, "p": "A função $y=|ax^2+bx+c|, (a≠0, b≠0, c≠0)$ é uma função:", "opts": ["A. Positiva", "B. Positiva quando x≥0 e negativa caso contrário", "C. Par", "D. Ímpar", "E. Nenhuma delas"], "c": "E", "img": None},
         {"id": 5, "p": "Para que valores de x é válida a equação $|x+\pi|=-(x+\pi)$?", "opts": ["A. x ≥ 0", "B. x = -π", "C. x ≥ π", "D. x ≤ 0", "E. x ≤ -π"], "c": "E", "img": None},
@@ -96,14 +96,12 @@ if "perguntas" not in st.session_state:
         {"id": 80, "p": "Valor da amplitude de aceleração do corpo no gráfico MHS?", "opts": ["A. pi²", "B. 2pi²", "C. 3pi²", "D. 4pi²", "E. 5pi²"], "c": "B", "img": "q80.png"}
     ]
 
-
+    # Mesclagem Intercalada (M1, F41, M2, F42...)
     final_list = []
     for m, f in zip(m_qs, f_qs):
         final_list.append(m)
         final_list.append(f)
-
     st.session_state.perguntas = final_list
-
 
 # 3. Lógica de Navegação e Estado
 if "i" not in st.session_state: st.session_state.i = 0
@@ -113,10 +111,6 @@ if "ver_gabarito" not in st.session_state: st.session_state.ver_gabarito = False
 if "inicio_t" not in st.session_state: st.session_state.inicio_t = time.time()
 if "quest_t" not in st.session_state: st.session_state.quest_t = time.time()
 
-# ⏱️ TEMPO POR QUESTÃO (ADICIONADO)
-TEMPO_QUESTAO = 60
-
-
 def proxima_questao():
     if st.session_state.i + 1 < len(st.session_state.perguntas):
         st.session_state.i += 1
@@ -125,31 +119,19 @@ def proxima_questao():
         st.session_state.quiz_fim = True
     st.rerun()
 
-
 # 4. Interface Principal
 st.title("📚 Exame Integrado UEM 2025")
 st.markdown("### Matemática I & Física I")
 
 if not st.session_state.quiz_fim:
-
     # Cabeçalho de Status
-    t_global = max(0, 10800 - int(time.time() - st.session_state.inicio_t))
+    t_global = max(0, 10800 - int(time.time() - st.session_state.inicio_t)) # 3 horas
     c1, c2, c3 = st.columns(3)
-    c1.metric("⏳ Total", f"{t_global//60}m {t_global%60}s")
-
+    c1.metric("⏳ Total", f"{t_global//60}m")
     c2.metric("📊 Questão", f"{st.session_state.i + 1}/80")
     c3.progress((st.session_state.i + 1)/80)
 
     st.divider()
-
-    # ⏱️ CRONÓMETRO DA QUESTÃO (ADICIONADO)
-tempo_passado = time.time() - st.session_state.quest_t
-tempo_restante = int(TEMPO_QUESTAO - tempo_passado)
-
-if tempo_restante <= 0:
-    proxima_questao()
-else:
-    st.warning(f"⏱️ Tempo da questão: {tempo_restante}s")
 
     # Conteúdo da Questão
     q = st.session_state.perguntas[st.session_state.i]
@@ -157,6 +139,7 @@ else:
     st.info(f"**Matéria:** {tipo}")
 
     if q["img"]:
+        # Tenta carregar a imagem se existir na pasta imagens/
         img_path = f"imagens/{q['img']}"
         if os.path.exists(img_path):
             st.image(img_path, use_container_width=True)
@@ -164,22 +147,18 @@ else:
             st.warning(f"Figura: {q['img']} (Arquivo não encontrado)")
 
     st.markdown(f"#### Questão {q['id']}")
+    st.write(q['p'])
 
-    # 📄 ENUNCIADO COMPLETO (CORRIGIDO)
-    st.markdown(
-        f"<div style='white-space: normal; font-size: 17px'>{q['p']}</div>",
-        unsafe_allow_html=True
-    )
-
+    # Lógica de seleção (preservar resposta ao voltar)
     marcada = st.session_state.respostas.get(st.session_state.i, None)
     idx_radio = 0
     if marcada:
         for idx, opt in enumerate(q["opts"]):
-            if opt.startswith(marcada):
-                idx_radio = idx
+            if opt.startswith(marcada): idx_radio = idx
 
     escolha = st.radio("Sua escolha:", q["opts"], index=idx_radio, key=f"q_{st.session_state.i}")
 
+    # Botões
     if st.button("✅ SALVAR E CONTINUAR", use_container_width=True, type="primary"):
         st.session_state.respostas[st.session_state.i] = escolha[0]
         proxima_questao()
@@ -189,13 +168,36 @@ else:
         if st.button("⬅️ VOLTAR", use_container_width=True, disabled=(st.session_state.i == 0)):
             st.session_state.i -= 1
             st.rerun()
-
     with col_p:
         if st.button("PULAR ➡️", use_container_width=True):
             proxima_questao()
 
-    #time.sleep(1)
-    #st.rerun()
+    time.sleep(1) # Refresh para cronômetro
+    st.rerun()
 
 else:
+    # Fim do Exame
     st.success("🏁 EXAME CONCLUÍDO!")
+    acertos = sum(1 for i, q in enumerate(st.session_state.perguntas) if st.session_state.respostas.get(i) == q["c"])
+    nota = (acertos / 80) * 20
+    
+    st.balloons()
+    res_c1, res_c2 = st.columns(2)
+    res_c1.metric("Total Acertos", f"{acertos} / 80")
+    res_c2.metric("Nota Final", f"{nota:.1f} / 20")
+
+    if st.button("🔄 REINICIAR TUDO", use_container_width=True):
+        for key in list(st.session_state.keys()): del st.session_state[key]
+        st.rerun()
+
+    st.divider()
+    if st.button("🔍 VER CORRECÇÃO DETALHADA", use_container_width=True):
+        st.session_state.ver_gabarito = not st.session_state.ver_gabarito
+
+    if st.session_state.ver_gabarito:
+        for i, q in enumerate(st.session_state.perguntas):
+            sua = st.session_state.respostas.get(i, "-")
+            status = "✅" if sua == q["c"] else "❌"
+            with st.expander(f"Q{q['id']} - {status}"):
+                st.write(f"**Questão:** {q['p']}")
+                st.write(f"Sua resposta: {sua} | Correta: **{q['c']}**")
