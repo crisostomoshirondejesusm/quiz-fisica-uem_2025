@@ -5,7 +5,7 @@ import streamlit.components.v1 as components
 # 1. Configurações da Página
 st.set_page_config(page_title="Exame de Física UEM 2025", layout="centered")
 
-# 2. Banco de Dados Completo (41 a 80)
+# 2. Banco de Dados Completo (Questões 41 a 80 conforme o PDF)
 if "perguntas" not in st.session_state:
     st.session_state.perguntas = [
         {"id": 41, "p": "Um recipiente de vidro está quase cheio com água em temperatura ambiente. Ao colocá-lo sobre uma chama de fogão, a água começa a se aquecer por:", "opts": ["A. Condução", "B. irradiação", "C. convecção", "D. condução e convecção", "E. convecção e irradiação"], "c": "C", "img": None},
@@ -22,7 +22,7 @@ if "perguntas" not in st.session_state:
         {"id": 52, "p": "Número de fotões de diferentes energias que um átomo de hidrogênio emite com electrão na 3ª órbita?", "opts": ["A. 1", "B. 2", "C. 3", "D. 4", "E. 5"], "c": "C", "img": None},
         {"id": 53, "p": "Energia cinética adquirida por electrões acelerados por 5000 V?", "opts": ["A. 2,0x10^-16J", "B. 4,0x10^-16J", "C. 6,0x10^-16J", "D. 8,0x10^-16J", "E. 10,0x10^-16J"], "c": "D", "img": None},
         {"id": 54, "p": "Tensão (kV) no ânodo de tubo de raios X para frequência máxima de 3x10^19 Hz?", "opts": ["A. 124", "B. 130", "C. 132", "D. 140", "E. 142"], "c": "A", "img": None},
-        {"id": 55, "p": "No diagrama de níveis de energia, qual transição emite fotão com maior momento linear?", "opts": ["A. 1", "B. 2", "C. 3", "D. 4", "E. 5"], "c": "A", "img": "Níveis de Energia do Hidrogénio"},
+        {"id": 55, "p": "No diagrama de níveis de energia, qual transição emite fotão com maior momento linear?", "opts": ["A. 1", "B. 2", "C. 3", "D. 4", "E. 5"], "c": "A", "img": "Níveis de Energia"},
         {"id": 56, "p": "A radioactividade é consequência de:", "opts": ["A. energia térmica", "B. alterações no núcleo dos átomos", "C. escape de electrões", "D. rupturas químicas", "E. reorganização de átomos"], "c": "B", "img": None},
         {"id": 57, "p": "Sobre partículas alfa e beta, é correcto dizer que:", "opts": ["A. beta são 2p+2n", "B. alfa são 2p+2e", "C. alfa são núcleos de hélio", "D. alfa são apenas 2p", "E. beta são electrões do núcleo"], "c": "E", "img": None},
         {"id": 58, "p": "Quantos neutrões tem o núcleo de 208/83 Bi?", "opts": ["A. 83", "B. 125", "C. 208", "D. 291", "E. 308"], "c": "B", "img": None},
@@ -42,15 +42,15 @@ if "perguntas" not in st.session_state:
         {"id": 72, "p": "Número de moles em recipiente cúbico (0,5m), P=59760Pa, T=300K?", "opts": ["A. 3", "B. 5", "C. 7", "D. 9", "E. 11"], "c": "A", "img": None},
         {"id": 73, "p": "Denominações das etapas (1->2, 2->3, 3->1) no gráfico V vs T?", "opts": ["A. Isobárica, Isovolumétrica", "B. Isovolumétrica, Isobárica, Isotérmica", "C. Isotérmica, Isobárica", "D. Adiabática", "E. Cíclica"], "c": "B", "img": "Gráfico V vs T"},
         {"id": 74, "p": "Volume (L) de hidrogênio a 293K (inicial 0,15L a 300K, P constante)?", "opts": ["A. 0,10", "B. 0,12", "C. 0,14", "D. 0,15", "E. 0,16"], "c": "C", "img": None},
-        {"id": 75, "p": "Qual representação de processos em gases ideais é FALSA?", "opts": ["A", "B", "C", "D", "E"], "c": "E", "img": "Gráficos de Processos Gasosos"},
+        {"id": 75, "p": "Qual representação de processos em gases ideais é FALSA?", "opts": ["A", "B", "C", "D", "E"], "c": "E", "img": "Gráficos de Processos"},
         {"id": 76, "p": "Variação de energia interna total após as duas etapas (Q1=500, W1=200; Q2=-300, W2=-100)?", "opts": ["A. 50", "B. 100", "C. 150", "D. 200", "E. 250"], "c": "B", "img": None},
         {"id": 77, "p": "Trabalho realizado por gás em expansão adiabática que recebe 10 kJ?", "opts": ["A. 0", "B. 5", "C. 10", "D. 15", "E. 20"], "c": "C", "img": None},
-        {"id": 78, "p": "Trabalho total (J) no ciclo XY-YZ-ZX do gráfico p vs V?", "opts": ["A. 1,6x10^5", "B. 2,0x10^5", "C. 3,2x10^5", "D. 4,8x10^5", "E. 0"], "c": "A", "img": "Gráfico Pressão vs Volume"},
+        {"id": 78, "p": "Trabalho total (J) no ciclo XY-YZ-ZX do gráfico p vs V?", "opts": ["A. 1,6x10^5", "B. 2,0x10^5", "C. 3,2x10^5", "D. 4,8x10^5", "E. 0"], "c": "A", "img": "Gráfico Ciclo Termodinâmico"},
         {"id": 79, "p": "Período e amplitude de massa 0,2kg, k=0,8pi² N/m, afastada 3cm?", "opts": ["A. 0,5s e 2cm", "B. 1,0s e 3cm", "C. 1,5s e 4cm", "D. 2,0s e 5cm", "E. 2,5s e 6cm"], "c": "B", "img": None},
         {"id": 80, "p": "Valor da amplitude de aceleração do corpo no gráfico MHS?", "opts": ["A. pi²", "B. 2pi²", "C. 3pi²", "D. 4pi²", "E. 5pi²"], "c": "B", "img": "Gráfico MHS"}
     ]
 
-# 3. Gestão de Estado
+# 3. Gestão de Estado da Sessão
 if "i" not in st.session_state: st.session_state.i = 0
 if "respostas" not in st.session_state: st.session_state.respostas = {}
 if "quiz_fim" not in st.session_state: st.session_state.quiz_fim = False
@@ -63,21 +63,21 @@ def reiniciar_total():
     st.rerun()
 
 # 4. Interface Principal
-st.title("📝 Exame de Admissão Física I - UEM 2025")
+st.title("📝 Exame de Física I - UEM 2025")
 
 if not st.session_state.quiz_fim:
     # --- TEMPO NO TOPO ---
     t_restante = max(0, 5400 - int(time.time() - st.session_state.inicio_t))
     c_t1, c_t2 = st.columns(2)
     c_t1.metric("⏳ Tempo Restante", f"{t_restante//60}m {t_restante%60}s")
-    c_t2.metric("📊 Progresso", f"{st.session_state.i + 1} / 40")
+    c_t2.metric("📊 Questão", f"{st.session_state.i + 1} / 40")
     
     st.divider()
 
     idx = st.session_state.i
     quest = st.session_state.perguntas[idx]
     
-    # --- FIGURAS ---
+    # --- MOSTRAR FIGURAS ---
     if quest["img"]:
         st.info(f"📍 Referência Visual: {quest['img']}")
         if quest["id"] == 46:
@@ -108,12 +108,12 @@ if not st.session_state.quiz_fim:
             st.session_state.quiz_fim = True
         st.rerun()
 
-    c1, c2 = st.columns(2)
-    with c1:
+    c_b1, c_b2 = st.columns(2)
+    with c_b1:
         if st.button("⬅️ VOLTAR", use_container_width=True, disabled=(idx==0)):
             st.session_state.i -= 1
             st.rerun()
-    with c2:
+    with c_b2:
         if st.button("PULAR ➡️", use_container_width=True):
             if idx + 1 < 40:
                 st.session_state.i += 1
@@ -135,7 +135,7 @@ else:
     res_c1.metric("Pontuação", f"{acertos} / 40")
     res_c2.metric("Nota (0-20)", f"{(acertos/40)*20:.1f}")
 
-    if st.button("📸 CAPTURAR ECRÃ (PRINT/PDF)", use_container_width=True, type="primary"):
+    if st.button("📸 CAPTURAR RESULTADOS (PDF/PRINT)", use_container_width=True, type="primary"):
         components.html("<script>window.print();</script>", height=0)
 
     st.divider()
@@ -150,12 +150,12 @@ else:
             sua = st.session_state.respostas.get(i, "N/A")
             cor = "✅" if sua == q["c"] else "❌"
             with st.expander(f"Questão {q['id']}: {cor}"):
-                st.write(f"Sua: {sua} | Correcta: {q['c']}")
+                st.write(f"Sua Resposta: {sua} | Correcta: {q['c']}")
         
         if st.button("⬆️ ESCONDER CORRECÇÃO", use_container_width=True):
             st.session_state.ver_gabarito = False
             st.rerun()
 
-    # --- REINICIAR TOTAL ---
+    # --- REINICIAR ---
     if st.button("🔄 REINICIAR TESTE (LIMPAR TUDO)", use_container_width=True):
         reiniciar_total()
