@@ -81,13 +81,15 @@ if not st.session_state.quiz_fim:
     if quest["img"]:
         st.info(f"📍 Referência Visual: {quest['img']}")
         if quest["id"] == 46:
+            pass
             
         elif quest["id"] == 55:
+            pass
             
         elif quest["id"] == 66:
-            
+            pass
         elif quest["id"] == 78:
-            
+            pass
 
     st.markdown(f"#### {quest['p']}")
     
