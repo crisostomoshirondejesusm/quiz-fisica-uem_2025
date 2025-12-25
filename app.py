@@ -64,6 +64,7 @@ def reiniciar_total():
 
 # 4. Interface Principal
 st.title("📝 Exame de Admissão Física I - UEM 2025")
+
 if not st.session_state.quiz_fim:
     # --- TEMPO NO TOPO ---
     t_restante = max(0, 5400 - int(time.time() - st.session_state.inicio_t))
@@ -80,13 +81,13 @@ if not st.session_state.quiz_fim:
     if quest["img"]:
         st.info(f"📍 Referência Visual: {quest['img']}")
         if quest["id"] == 46:
-            pass
+            
         elif quest["id"] == 55:
-            pass
+            
         elif quest["id"] == 66:
-            pass
+            
         elif quest["id"] == 78:
-            pass
+            
 
     st.markdown(f"#### {quest['p']}")
     
@@ -94,8 +95,7 @@ if not st.session_state.quiz_fim:
     id_radio = 0
     if marcada:
         for i_opt, txt in enumerate(quest["opts"]):
-            if txt.startswith(marcada):
-                id_radio = i_opt
+            if txt.startswith(marcada): id_radio = i_opt
 
     escolha = st.radio("Escolha a sua resposta:", quest["opts"], index=id_radio, key=f"r{idx}")
 
@@ -121,7 +121,40 @@ if not st.session_state.quiz_fim:
                 st.session_state.quiz_fim = True
             st.rerun()
 
+    time.sleep(1)
+    st.rerun()
 
+# 5. ECRÃ DE RESULTADOS
+else:
+    st.success("🏁 EXAME TERMINADO!")
+    
+    acertos = sum(1 for i, q in enumerate(st.session_state.perguntas) if st.session_state.respostas.get(i) == q["c"])
+    
+    st.markdown("### 📊 Resultado")
+    res_c1, res_c2 = st.columns(2)
+    res_c1.metric("Pontuação", f"{acertos} / 40")
+    res_c2.metric("Nota (0-20)", f"{(acertos/40)*20:.1f}")
+
+    if st.button("📸 CAPTURAR ECRÃ (PRINT/PDF)", use_container_width=True, type="primary"):
+        components.html("<script>window.print();</script>", height=0)
+
+    st.divider()
+
+    # --- GABARITO ---
+    if not st.session_state.ver_gabarito:
+        if st.button("🔍 MOSTRAR CORRECÇÃO", use_container_width=True):
+            st.session_state.ver_gabarito = True
+            st.rerun()
+    else:
+        for i, q in enumerate(st.session_state.perguntas):
+            sua = st.session_state.respostas.get(i, "N/A")
+            cor = "✅" if sua == q["c"] else "❌"
+            with st.expander(f"Questão {q['id']}: {cor}"):
+                st.write(f"Sua: {sua} | Correcta: {q['c']}")
+        
+        if st.button("⬆️ ESCONDER CORRECÇÃO", use_container_width=True):
+            st.session_state.ver_gabarito = False
+            st.rerun()
 
     # --- REINICIAR TOTAL ---
     if st.button("🔄 REINICIAR TESTE (LIMPAR TUDO)", use_container_width=True):
