@@ -1,14 +1,12 @@
 import streamlit as st
 import time
-import streamlit.components.v1 as components
 import os
 
 # 1. Configurações da Página
 st.set_page_config(page_title="Exame Unificado UEM 2025", layout="centered")
 
-# 2. Banco de Dados Completo (Mantendo exatamente como fornecido)
+# 2. Banco de Dados Completo (80 questões)
 if "perguntas" not in st.session_state:
-    # --- MATEMÁTICA (1 a 40) ---
     m_qs = [
         {"id": 1, "p": "Indique as soluções da equação $-|x-2|+6=2$:", "opts": ["A. x=2 v x=6", "B. x=-4 v x=4", "C. x=2", "D. x=-2 v x=6", "E. x=4"], "c": "D", "img": None},
         {"id": 2, "p": "Dizemos que $|x|>3$ se:", "opts": ["A. x ∈ ]-∞,-3[ ∪ ]3,+∞[", "B. x ∈ R", "C. x ∈ ]-3,3[", "D. x ∈ ]-∞,-3] ∪ [3,+∞[", "E. x ∈ ]3,+∞["], "c": "A", "img": None},
@@ -32,7 +30,7 @@ if "perguntas" not in st.session_state:
         {"id": 20, "p": "Quais os zeros de $(f \circ g^{-1})(x)$ sendo $f(x)=x^2-9$ e $g(x)=2x+4$?", "opts": ["A. {-2, 10}", "B. {-3, 2, 3}", "C. {-3, 0}", "D. {0}", "E. {1, 3}"], "c": "A", "img": None},
         {"id": 21, "p": "Numa P.A. $u_5+u_6=31$ e $u_7+u_9=46$. O primeiro termo e a razão são:", "opts": ["A. u1=1, r=3", "B. u1=-2, r=2", "C. u1=2, r=3", "D. u1=3, r=4", "E. u1=3, r=2"], "c": "C", "img": None},
         {"id": 22, "p": "Numa P.G. de termos positivos, $v_5=4$ e $v_8=108$. Determine $v_6$:", "opts": ["A. 6", "B. 12", "C. 51", "D. 76", "E. 98"], "c": "B", "img": None},
-        {"id": 23, "p": "A sucessão definida por $u_n = \log_{1/2}(3^n)$ é uma:", "opts": ["A. P.A. crescent", "B. P.A. decrescente", "C. P.G. crescente", "D. P.G. decrescente", "E. Nenhuma"], "c": "B", "img": None},
+        {"id": 23, "p": "A sucessão definida por $u_n = \log_{1/2}(3^n)$ é uma:", "opts": ["A. P.A. crescente", "B. P.A. decrescente", "C. P.G. crescente", "D. P.G. decrescente", "E. Nenhuma"], "c": "B", "img": None},
         {"id": 24, "p": "Indique qual das sucessões é convergente:", "opts": ["A. (-1)^n * n", "B. (-1)^n + n", "C. (-1)^n - n", "D. (-1)^n / n", "E. (-1)^n * n!"], "c": "D", "img": None},
         {"id": 25, "p": "Sobre a sucessão $v_n$ (n se n<10; 1+1/n se n≥10), é correcto afirmar que é:", "opts": ["A. ilimitada", "B. decrescente", "C. crescente", "D. divergente", "E. limitada"], "c": "E", "img": None},
         {"id": 26, "p": "Qual é o valor do limite de $(2n^2+3n+4)/(n^2+4)$ quando n tende ao infinito?", "opts": ["A. 0", "B. 1", "C. 2", "D. 3", "E. +∞"], "c": "C", "img": None},
@@ -51,8 +49,7 @@ if "perguntas" not in st.session_state:
         {"id": 39, "p": "Indique uma primitiva da função $f(x) = e^x + 1$:", "opts": ["A. 2e^x", "B. e^(x^2)/2", "C. e^x/2 + x", "D. xe^(x-1)+x", "E. e^x + x"], "c": "E", "img": None},
         {"id": 40, "p": "Qual é o resultado do produto $(3 - 2i) \cdot (-4 + i)$ no conjunto dos complexos?", "opts": ["A. 10+2i", "B. 11i", "C. -12-2i", "D. -10+11i", "E. -10"], "c": "D", "img": None}
     ]
-
-    # --- FÍSICA (41 a 80) ---
+    # (Inserir física 41-80 aqui...)
     f_qs = [
         {"id": 41, "p": "Um recipiente de vidro está quase cheio com água em temperatura ambiente. Ao colocá-lo sobre uma chama de fogão, a água começa a se aquecer por:", "opts": ["A. Condução", "B. irradiação", "C. convecção", "D. condução e convecção", "E. convecção e irradiação"], "c": "C", "img": None},
         {"id": 42, "p": "Quais são as características capazes de distinguir um tipo de onda electromagnética de outro?", "opts": ["A. intensidade, velocidade, área, comprimento", "B. amplitude, velocidade da propagação, frequência, comprimento de onda", "C. amplitude, polarização, frequência, direcção", "D. altura, intensidade, timbre, velocidade", "E. amplitude, perturbação, propagação"], "c": "B", "img": None},
@@ -95,132 +92,103 @@ if "perguntas" not in st.session_state:
         {"id": 79, "p": "Período e amplitude de massa 0,2kg, k=0,8pi² N/m, afastada 3cm?", "opts": ["A. 0,5s e 2cm", "B. 1,0s e 3cm", "C. 1,5s e 4cm", "D. 2,0s e 5cm", "E. 2,5s e 6cm"], "c": "B", "img": None},
         {"id": 80, "p": "Valor da amplitude de aceleração do corpo no gráfico MHS?", "opts": ["A. pi²", "B. 2pi²", "C. 3pi²", "D. 4pi²", "E. 5pi²"], "c": "B", "img": "q80.png"}
     ]
-
-    # Mesclagem Intercalada (M1, F41, M2, F42...)
+    
     final_list = []
     for m, f in zip(m_qs, f_qs):
         final_list.append(m)
         final_list.append(f)
     st.session_state.perguntas = final_list
 
-# 3. Lógica de Navegação e Estado
+# 3. Lógica de Navegação
 if "i" not in st.session_state: st.session_state.i = 0
 if "respostas" not in st.session_state: st.session_state.respostas = {}
 if "quiz_fim" not in st.session_state: st.session_state.quiz_fim = False
-if "ver_gabarito" not in st.session_state: st.session_state.ver_gabarito = False
 if "inicio_t" not in st.session_state: st.session_state.inicio_t = time.time()
 if "quest_t" not in st.session_state: st.session_state.quest_t = time.time()
 
-def proxima_questao():
+def avancar():
     if st.session_state.i + 1 < len(st.session_state.perguntas):
         st.session_state.i += 1
         st.session_state.quest_t = time.time()
     else:
         st.session_state.quiz_fim = True
+
+def voltar():
+    if st.session_state.i > 0:
+        st.session_state.i -= 1
+        st.session_state.quest_t = time.time()
+
+# --- LÓGICA DE TEMPO ---
+tempo_restante_q = int(90 - (time.time() - st.session_state.quest_t))
+if tempo_restante_q <= 0 and not st.session_state.quiz_fim:
+    avancar()
     st.rerun()
 
-# --- LÓGICA DE TEMPO ADICIONADA ---
-# Tempo por questão: 90s
-tempo_gasto_questao = int(time.time() - st.session_state.quest_t)
-tempo_restante_questao = max(0, 90 - tempo_gasto_questao)
-
-if tempo_restante_questao <= 0 and not st.session_state.quiz_fim:
-    proxima_questao()
-
-# Tempo total: 3 horas (10800s)
-tempo_gasto_global = int(time.time() - st.session_state.inicio_t)
-tempo_restante_global = max(0, 10800 - tempo_gasto_global)
-
-if tempo_restante_global <= 0:
+tempo_restante_total = int(10800 - (time.time() - st.session_state.inicio_t))
+if tempo_restante_total <= 0:
     st.session_state.quiz_fim = True
-# ----------------------------------
 
 # 4. Interface Principal
 st.title("📚 Exame Integrado UEM 2025")
-st.markdown("### Matemática I & Física I")
 
 if not st.session_state.quiz_fim:
-    # Cabeçalho de Status
-    c1, c2, c3, c4 = st.columns(4)
-    # Mostrando tempo global como HH:MM:SS
-    horas_g = tempo_restante_global // 3600
-    mins_g = (tempo_restante_global % 3600) // 60
-    segs_g = tempo_restante_global % 60
-    c1.metric("⏳ Exame", f"{horas_g:02d}:{mins_g:02d}:{segs_g:02d}")
-    
-    # Mostrando tempo da questão
-    c2.metric("⏱️ Questão", f"{tempo_restante_questao}s")
-    
-    c3.metric("📊 Questão", f"{st.session_state.i + 1}/80")
-    c4.progress((st.session_state.i + 1)/80)
+    # Cabeçalho
+    c1, c2, c3 = st.columns(3)
+    c1.metric("⏳ Exame", f"{tempo_restante_total//60}m")
+    c2.metric("⏱️ Questão", f"{tempo_restante_q}s")
+    c3.metric("📊 Progresso", f"{st.session_state.i + 1}/80")
+    st.progress((st.session_state.i + 1)/80)
 
     st.divider()
 
-    # Conteúdo da Questão
+    # Questão Atual
     q = st.session_state.perguntas[st.session_state.i]
-    tipo = "📐 MATEMÁTICA" if q['id'] <= 40 else "⚡ FÍSICA"
-    st.info(f"**Matéria:** {tipo}")
-
+    st.info(f"**Matéria:** {'📐 MATEMÁTICA' if q['id'] <= 40 else '⚡ FÍSICA'}")
+    
+    # Imagem
     if q["img"]:
-        img_path = f"imagens/{q['img']}"
-        if os.path.exists(img_path):
-            st.image(img_path, use_container_width=True)
-        else:
-            st.warning(f"Figura: {q['img']} (Arquivo não encontrado)")
+        path = f"imagens/{q['img']}"
+        if os.path.exists(path): st.image(path)
+        else: st.warning(f"Figura: {q['img']}")
 
-    st.markdown(f"#### Questão {q['id']}")
+    # Enunciado e Radio
+    st.markdown(f"### Questão {q['id']}")
     st.write(q['p'])
 
-    # Lógica de seleção
-    markada = st.session_state.respostas.get(st.session_state.i, None)
-    idx_radio = 0
-    if markada:
-        for idx, opt in enumerate(q["opts"]):
-            if opt.startswith(markada): idx_radio = idx
+    # Recupera escolha anterior
+    resp_salva = st.session_state.respostas.get(st.session_state.i, None)
+    idx = 0
+    if resp_salva:
+        for i_opt, opt in enumerate(q["opts"]):
+            if opt.startswith(resp_salva): idx = i_opt
 
-    escolha = st.radio("Sua escolha:", q["opts"], index=idx_radio, key=f"q_{st.session_state.i}")
+    escolha = st.radio("Selecione a opção:", q["opts"], index=idx, key=f"rad_{st.session_state.i}")
 
-    # Botões (Mantendo a disposição original)
-    if st.button("✅ SALVAR E CONTINUAR", use_container_width=True, type="primary"):
+    # BOTÕES DE AÇÃO
+    if st.button("✅ SALVAR E PRÓXIMA", use_container_width=True, type="primary"):
         st.session_state.respostas[st.session_state.i] = escolha[0]
-        proxima_questao()
+        avancar()
+        st.rerun()
 
-    col_v, col_p = st.columns(2)
-    with col_v:
+    col_btn1, col_btn2 = st.columns(2)
+    with col_btn1:
         if st.button("⬅️ VOLTAR", use_container_width=True, disabled=(st.session_state.i == 0)):
-            st.session_state.i -= 1
-            st.session_state.quest_t = time.time() # Reset do tempo ao voltar para não pular de imediato
+            voltar()
             st.rerun()
-    with col_p:
+    with col_btn2:
         if st.button("PULAR ➡️", use_container_width=True):
-            proxima_questao()
+            avancar()
+            st.rerun()
 
-    time.sleep(1) # Refresh para cronômetro
+    time.sleep(1)
     st.rerun()
 
 else:
-    # Fim do Exame (Mantendo original)
+    # Resultados
     st.success("🏁 EXAME CONCLUÍDO!")
     acertos = sum(1 for i, q in enumerate(st.session_state.perguntas) if st.session_state.respostas.get(i) == q["c"])
-    nota = (acertos / 80) * 20
+    st.metric("Nota Final", f"{(acertos/80)*20:.1f} / 20")
     
-    st.balloons()
-    res_c1, res_c2 = st.columns(2)
-    res_c1.metric("Total Acertos", f"{acertos} / 80")
-    res_c2.metric("Nota Final", f"{nota:.1f} / 20")
-
-    if st.button("🔄 REINICIAR TUDO", use_container_width=True):
-        for key in list(st.session_state.keys()): del st.session_state[key]
+    if st.button("🔄 REINICIAR EXAME"):
+        st.session_state.clear()
         st.rerun()
-
-    st.divider()
-    if st.button("🔍 VER CORRECÇÃO DETALHADA", use_container_width=True):
-        st.session_state.ver_gabarito = not st.session_state.ver_gabarito
-
-    if st.session_state.ver_gabarito:
-        for i, q in enumerate(st.session_state.perguntas):
-            sua = st.session_state.respostas.get(i, "-")
-            status = "✅" if sua == q["c"] else "❌"
-            with st.expander(f"Q{q['id']} - {status}"):
-                st.write(f"**Questão:** {q['p']}")
-                st.write(f"Sua resposta: {sua} | Correta: **{q['c']}**")
