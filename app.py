@@ -56,10 +56,20 @@ if "respostas" not in st.session_state: st.session_state.respostas = {}
 if "quiz_fim" not in st.session_state: st.session_state.quiz_fim = False
 if "ver_gabarito" not in st.session_state: st.session_state.ver_gabarito = False
 if "inicio_t" not in st.session_state: st.session_state.inicio_t = time.time()
+# NOVO: Início do tempo da questão atual
+if "quest_t" not in st.session_state: st.session_state.quest_t = time.time()
 
 def reiniciar_total():
     for key in list(st.session_state.keys()):
         del st.session_state[key]
+    st.rerun()
+
+def proxima_questao():
+    if st.session_state.i + 1 < 40:
+        st.session_state.i += 1
+        st.session_state.quest_t = time.time() # Reseta tempo da nova questão
+    else:
+        st.session_state.quiz_fim = True
     st.rerun()
 
 # 4. Interface Principal
@@ -67,10 +77,17 @@ st.title("📝 Exame de Admissão Física I - UEM 2025")
 
 if not st.session_state.quiz_fim:
     # --- TEMPO NO TOPO ---
-    t_restante = max(0, 5400 - int(time.time() - st.session_state.inicio_t))
-    c_t1, c_t2 = st.columns(2)
-    c_t1.metric("⏳ Tempo Restante", f"{t_restante//60}m {t_restante%60}s")
-    c_t2.metric("📊 Progresso", f"{st.session_state.i + 1} / 40")
+    t_global_restante = max(0, 5400 - int(time.time() - st.session_state.inicio_t))
+    # NOVO: Cálculo do tempo da questão (90s)
+    t_quest_restante = max(0, 90 - int(time.time() - st.session_state.quest_t))
+    
+    if t_quest_restante <= 0:
+        proxima_questao()
+
+    c_t1, c_t2, c_t3 = st.columns(3)
+    c_t1.metric("⏳ Global", f"{t_global_restante//60}m {t_global_restante%60}s")
+    c_t2.metric("⏱️ Questão", f"{t_quest_restante}s", delta_color="inverse" if t_quest_restante < 10 else "normal")
+    c_t3.metric("📊 Progresso", f"{st.session_state.i + 1} / 40")
     
     st.divider()
 
@@ -80,15 +97,10 @@ if not st.session_state.quiz_fim:
     # --- FIGURAS ---
     if quest["img"]:
         st.info(f"📍 Referência Visual: {quest['img']}")
-        if quest["id"] == 46:
-            pass
-            
-        elif quest["id"] == 55:
-            pass
-        elif quest["id"] == 66:
-            pass
-        elif quest["id"] == 78:
-            pass
+        if quest["id"] == 46: pass
+        elif quest["id"] == 55: pass
+        elif quest["id"] == 66: pass
+        elif quest["id"] == 78: pass
 
     st.markdown(f"#### {quest['p']}")
     
@@ -103,25 +115,19 @@ if not st.session_state.quiz_fim:
     # --- NAVEGAÇÃO ---
     if st.button("✅ RESPONDER E AVANÇAR", use_container_width=True, type="primary"):
         st.session_state.respostas[idx] = escolha[0]
-        if idx + 1 < 40:
-            st.session_state.i += 1
-        else:
-            st.session_state.quiz_fim = True
-        st.rerun()
+        proxima_questao()
 
     c1, c2 = st.columns(2)
     with c1:
         if st.button("⬅️ VOLTAR", use_container_width=True, disabled=(idx==0)):
             st.session_state.i -= 1
+            st.session_state.quest_t = time.time()
             st.rerun()
     with c2:
         if st.button("PULAR ➡️", use_container_width=True):
-            if idx + 1 < 40:
-                st.session_state.i += 1
-            else:
-                st.session_state.quiz_fim = True
-            st.rerun()
+            proxima_questao()
 
+    # Atualiza a tela a cada 1 segundo para o cronômetro rodar
     time.sleep(1)
     st.rerun()
 
