@@ -23,7 +23,31 @@ if "perguntas" not in st.session_state:
         {"id": 53, "p": "Energia cinética adquirida por electrões acelerados por 5000 V?", "opts": ["A. 2,0x10^-16J", "B. 4,0x10^-16J", "C. 6,0x10^-16J", "D. 8,0x10^-16J", "E. 10,0x10^-16J"], "c": "D", "img": None},
         {"id": 54, "p": "Tensão (kV) no ânodo de tubo de raios X para frequência máxima de 3x10^19 Hz?", "opts": ["A. 124", "B. 130", "C. 132", "D. 140", "E. 142"], "c": "A", "img": None},
         {"id": 55, "p": "No diagrama de níveis de energia, qual transição emite fotão com maior momento linear?", "opts": ["A. 1", "B. 2", "C. 3", "D. 4", "E. 5"], "c": "A", "img": "Níveis de Energia do Hidrogénio"},
-        # restante banco permanece igual…
+        {"id": 56, "p": "A radioactividade é consequência de:", "opts": ["A. energia térmica", "B. alterações no núcleo dos átomos", "C. escape de electrões", "D. rupturas químicas", "E. reorganização de átomos"], "c": "B", "img": None},
+        {"id": 57, "p": "Sobre partículas alfa e beta, é correcto dizer que:", "opts": ["A. beta são 2p+2n", "B. alfa são 2p+2e", "C. alfa são núcleos de hélio", "D. alfa são apenas 2p", "E. beta são electrões do núcleo"], "c": "E", "img": None},
+        {"id": 58, "p": "Quantos neutrões tem o núcleo de 208/83 Bi?", "opts": ["A. 83", "B. 125", "C. 208", "D. 291", "E. 308"], "c": "B", "img": None},
+        {"id": 59, "p": "Na reacção 27/13Al + gama -> 26/12Mg + X, a incógnita X representa:", "opts": ["A. alumínio", "B. oxigénio", "C. carbono", "D. hidrogénio", "E. hélio"], "c": "D", "img": None},
+        {"id": 60, "p": "Radiação que atinge o ponto 3 no experimento do Bloco de Chumbo:", "opts": ["A. Infravermelha", "B. Ultravioleta", "C. alfa", "D. beta", "E. gama"], "c": "D", "img": "Experimento Bloco de Chumbo"},
+        {"id": 61, "p": "Reacção que representa a produção de lixo radioactivo (fissão):", "opts": ["A. Fusão solar", "B. Decaimento beta", "C. Reacção em cadeia U-235", "D. Emissão gama", "E. Fusão de Hidrogênio"], "c": "C", "img": None},
+        {"id": 62, "p": "Energia de ligação por nucleão de um núcleo com 20 nucleões e energia total 160 MeV?", "opts": ["A. 4", "B. 8", "C. 16", "D. 32", "E. 40"], "c": "B", "img": None},
+        {"id": 63, "p": "Energia liberada (MeV) em fusão com defeito de massa de 0,02 uma? (1 uma = 931 MeV)", "opts": ["A. 14,6", "B. 15,6", "C. 16,6", "D. 17,6", "E. 18,6"], "c": "E", "img": None},
+        {"id": 64, "p": "Na reacção: n + U235 -> Cs144 + T + 2n, quais os números de T?", "opts": ["A. 37 e 90", "B. 38 e 91", "C. 39 e 90", "D. 40 e 91", "E. 41 e 90"], "c": "A", "img": None},
+        {"id": 65, "p": "Tempo para iodo-131 (meia-vida 8 dias) chegar a 1/16 da massa inicial?", "opts": ["A. 8 dias", "B. 16 dias", "C. 24 dias", "D. 32 dias", "E. 40 dias"], "c": "D", "img": None},
+        {"id": 66, "p": "Relação entre as vazões Q nas secções (1), (2) e (3) de uma tubulação?", "opts": ["A. Q1<Q2<Q3", "B. Q1>Q2>Q3", "C. Q1=Q2=Q3", "D. Q1+Q2=Q3", "E. Q1=Q2+Q3"], "c": "C", "img": "Tubulação Afunilada"},
+        {"id": 67, "p": "Velocidade do gás na saída sabendo P1=8atm, v1=10m/s e P2=1atm?", "opts": ["A. 40 m/s", "B. 50 m/s", "C. 60 m/s", "D. 70 m/s", "E. 80 m/s"], "c": "B", "img": None},
+        {"id": 68, "p": "Velocidade v2 em tubulação com v1=3m/s, r1=0,1m e r2=0,05m?", "opts": ["A. 6 m/s", "B. 9 m/s", "C. 12 m/s", "D. 15 m/s", "E. 18 m/s"], "c": "C", "img": None},
+        {"id": 69, "p": "Vazão (dm³/s) de torneira que enche 12000L em 40 minutos?", "opts": ["A. 5", "B. 10", "C. 15", "D. 20", "E. 25"], "c": "A", "img": None},
+        {"id": 70, "p": "Força (N) em prensa hidráulica para levantar 1000kg (áreas 4m² e 0,0025m²)?", "opts": ["A. 4,25", "B. 5,25", "C. 6,25", "D. 7,25", "E. 8,25"], "c": "C", "img": None},
+        {"id": 71, "p": "Velocidade (m/s) para encher piscina (18x10x2m) em 10h com conduto de 25cm²?", "opts": ["A. 2", "B. 4", "C. 6", "D. 8", "E. 10"], "c": "B", "img": None},
+        {"id": 72, "p": "Número de moles em recipiente cúbico (0,5m), P=59760Pa, T=300K?", "opts": ["A. 3", "B. 5", "C. 7", "D. 9", "E. 11"], "c": "A", "img": None},
+        {"id": 73, "p": "Denominações das etapas (1->2, 2->3, 3->1) no gráfico V vs T?", "opts": ["A. Isobárica, Isovolumétrica", "B. Isovolumétrica, Isobárica, Isotérmica", "C. Isotérmica, Isobárica", "D. Adiabática", "E. Cíclica"], "c": "B", "img": "Gráfico V vs T"},
+        {"id": 74, "p": "Volume (L) de hidrogênio a 293K (inicial 0,15L a 300K, P constante)?", "opts": ["A. 0,10", "B. 0,12", "C. 0,14", "D. 0,15", "E. 0,16"], "c": "C", "img": None},
+        {"id": 75, "p": "Qual representação de processos em gases ideais é FALSA?", "opts": ["A", "B", "C", "D", "E"], "c": "E", "img": "Gráficos de Processos Gasosos"},
+        {"id": 76, "p": "Variação de energia interna total após as duas etapas (Q1=500, W1=200; Q2=-300, W2=-100)?", "opts": ["A. 50", "B. 100", "C. 150", "D. 200", "E. 250"], "c": "B", "img": None},
+        {"id": 77, "p": "Trabalho realizado por gás em expansão adiabática que recebe 10 kJ?", "opts": ["A. 0", "B. 5", "C. 10", "D. 15", "E. 20"], "c": "C", "img": None},
+        {"id": 78, "p": "Trabalho total (J) no ciclo XY-YZ-ZX do gráfico p vs V?", "opts": ["A. 1,6x10^5", "B. 2,0x10^5", "C. 3,2x10^5", "D. 4,8x10^5", "E. 0"], "c": "A", "img": "Gráfico Pressão vs Volume"},
+        {"id": 79, "p": "Período e amplitude de massa 0,2kg, k=0,8pi² N/m, afastada 3cm?", "opts": ["A. 0,5s e 2cm", "B. 1,0s e 3cm", "C. 1,5s e 4cm", "D. 2,0s e 5cm", "E. 2,5s e 6cm"], "c": "B", "img": None},
+        {"id": 80, "p": "Valor da amplitude de aceleração do corpo no gráfico MHS?", "opts": ["A. pi²", "B. 2pi²", "C. 3pi²", "D. 4pi²", "E. 5pi²"], "c": "B", "img": "Gráfico MHS"}
     ]
 
 # 3. Gestão de Estado
@@ -33,21 +57,105 @@ if "quiz_fim" not in st.session_state: st.session_state.quiz_fim = False
 if "ver_gabarito" not in st.session_state: st.session_state.ver_gabarito = False
 if "inicio_t" not in st.session_state: st.session_state.inicio_t = time.time()
 
+def reiniciar_total():
+    for key in list(st.session_state.keys()):
+        del st.session_state[key]
+    st.rerun()
+
 # 4. Interface Principal
 st.title("📝 Exame de Admissão Física I - UEM 2025")
 
 if not st.session_state.quiz_fim:
+    # --- TEMPO NO TOPO ---
+    t_restante = max(0, 5400 - int(time.time() - st.session_state.inicio_t))
+    c_t1, c_t2 = st.columns(2)
+    c_t1.metric("⏳ Tempo Restante", f"{t_restante//60}m {t_restante%60}s")
+    c_t2.metric("📊 Progresso", f"{st.session_state.i + 1} / 40")
+    
+    st.divider()
 
     idx = st.session_state.i
     quest = st.session_state.perguntas[idx]
-
+    
+    # --- FIGURAS ---
     if quest["img"]:
         st.info(f"📍 Referência Visual: {quest['img']}")
         if quest["id"] == 46:
-            pass
+            
         elif quest["id"] == 55:
-            pass
+            
         elif quest["id"] == 66:
-            pass
+            
         elif quest["id"] == 78:
-            pass
+            
+
+    st.markdown(f"#### {quest['p']}")
+    
+    marcada = st.session_state.respostas.get(idx, None)
+    id_radio = 0
+    if marcada:
+        for i_opt, txt in enumerate(quest["opts"]):
+            if txt.startswith(marcada): id_radio = i_opt
+
+    escolha = st.radio("Escolha a sua resposta:", quest["opts"], index=id_radio, key=f"r{idx}")
+
+    # --- NAVEGAÇÃO ---
+    if st.button("✅ RESPONDER E AVANÇAR", use_container_width=True, type="primary"):
+        st.session_state.respostas[idx] = escolha[0]
+        if idx + 1 < 40:
+            st.session_state.i += 1
+        else:
+            st.session_state.quiz_fim = True
+        st.rerun()
+
+    c1, c2 = st.columns(2)
+    with c1:
+        if st.button("⬅️ VOLTAR", use_container_width=True, disabled=(idx==0)):
+            st.session_state.i -= 1
+            st.rerun()
+    with c2:
+        if st.button("PULAR ➡️", use_container_width=True):
+            if idx + 1 < 40:
+                st.session_state.i += 1
+            else:
+                st.session_state.quiz_fim = True
+            st.rerun()
+
+    time.sleep(1)
+    st.rerun()
+
+# 5. ECRÃ DE RESULTADOS
+else:
+    st.success("🏁 EXAME TERMINADO!")
+    
+    acertos = sum(1 for i, q in enumerate(st.session_state.perguntas) if st.session_state.respostas.get(i) == q["c"])
+    
+    st.markdown("### 📊 Resultado")
+    res_c1, res_c2 = st.columns(2)
+    res_c1.metric("Pontuação", f"{acertos} / 40")
+    res_c2.metric("Nota (0-20)", f"{(acertos/40)*20:.1f}")
+
+    if st.button("📸 CAPTURAR ECRÃ (PRINT/PDF)", use_container_width=True, type="primary"):
+        components.html("<script>window.print();</script>", height=0)
+
+    st.divider()
+
+    # --- GABARITO ---
+    if not st.session_state.ver_gabarito:
+        if st.button("🔍 MOSTRAR CORRECÇÃO", use_container_width=True):
+            st.session_state.ver_gabarito = True
+            st.rerun()
+    else:
+        for i, q in enumerate(st.session_state.perguntas):
+            sua = st.session_state.respostas.get(i, "N/A")
+            cor = "✅" if sua == q["c"] else "❌"
+            with st.expander(f"Questão {q['id']}: {cor}"):
+                st.write(f"Sua: {sua} | Correcta: {q['c']}")
+        
+        if st.button("⬆️ ESCONDER CORRECÇÃO", use_container_width=True):
+            st.session_state.ver_gabarito = False
+            st.rerun()
+
+    # --- REINICIAR TOTAL ---
+    if st.button("🔄 REINICIAR TESTE (LIMPAR TUDO)", use_container_width=True):
+        reiniciar_total()
