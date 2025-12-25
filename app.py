@@ -210,28 +210,46 @@ if not st.session_state.quiz_fim:
     st.rerun()
 
 else:
-    # 5. Resultados Finais
+    # 5. Cálculos de Resultados Finais
     duracao_total = int(st.session_state.fim_t - st.session_state.inicio_t)
     min_tot, seg_tot = divmod(duracao_total, 60)
     
+    # Contagem separada por matéria
+    acertos_m = 0
+    acertos_f = 0
+    total_m = 40
+    total_f = 40
+
+    for i, q in enumerate(st.session_state.perguntas):
+        resposta_usuario = st.session_state.respostas.get(i)
+        if resposta_usuario == q["c"]:
+            if q["id"] <= 40:
+                acertos_m += 1
+            else:
+                acertos_f += 1
+
+    total_acertos = acertos_m + acertos_f
+    nota_final = (total_acertos / 80) * 20
+    
     st.success("🏁 EXAME CONCLUÍDO!")
-    
-    acertos = sum(1 for i, q in enumerate(st.session_state.perguntas) if st.session_state.respostas.get(i) == q["c"])
-    nota = (acertos / 80) * 20
-    
     st.balloons()
     
+    # Container de Resumo com separação por matéria
     st.markdown(f"""
     <div style="background-color: #f9f9f9; padding: 20px; border-radius: 10px; border-left: 5px solid #28a745; margin-bottom: 20px;">
-        <h3>📊 Resumo do Desempenho</h3>
-        <p style="font-size: 1.2rem;"><b>Tempo Total de Realização:</b> {min_tot} minutos e {seg_tot} segundos</p>
-        <p style="font-size: 1.2rem;"><b>Pontuação:</b> {nota:.2f} / 20.00</p>
-        <p style="font-size: 1.2rem;"><b>Total de Acertos:</b> {acertos} de 80</p>
+        <h3 style="color: #333;">📊 Resumo do Desempenho</h3>
+        <p style="font-size: 1.2rem; color: #555;"><b>Tempo Total:</b> {min_tot} min e {seg_tot} seg</p>
+        <hr>
+        <p style="font-size: 1.1rem; color: #1f77b4;"><b>📐 Matemática:</b> {acertos_m} acertos de {total_m}</p>
+        <p style="font-size: 1.1rem; color: #ff7f0e;"><b>⚡ Física:</b> {acertos_f} acertos de {total_f}</p>
+        <hr>
+        <p style="font-size: 1.3rem; color: #d62728;"><b>🎯 Pontuação Final: {nota_final:.2f} / 20.00</b></p>
     </div>
     """, unsafe_allow_html=True)
 
     if st.button("🔄 REINICIAR TESTE", use_container_width=True):
-        for key in list(st.session_state.keys()): del st.session_state[key]
+        for key in list(st.session_state.keys()):
+            del st.session_state[key]
         st.rerun()
 
     st.divider()
@@ -243,7 +261,8 @@ else:
         for i, q in enumerate(st.session_state.perguntas):
             sua = st.session_state.respostas.get(i, "Não respondida")
             status = "✅" if sua == q["c"] else "❌"
+            cor = "green" if sua == q["c"] else "red"
             with st.expander(f"Q{i+1} (ID Original: {q['id']}) - {status}"):
                 st.write(f"**Enunciado:** {q['p']}")
-                st.write(f"Sua resposta: **{sua}**")
+                st.markdown(f"Sua resposta: <span style='color:{cor}'><b>{sua}</b></span>", unsafe_allow_html=True)
                 st.write(f"Resposta correta: **{q['c']}**")
