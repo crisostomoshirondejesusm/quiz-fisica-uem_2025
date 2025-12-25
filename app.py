@@ -3,10 +3,10 @@ import time
 import os
 
 # 1. Configurações da Página
-st.set_page_config(page_title="Exame Unificado UEM 2025", layout="centered")
+st.set_page_config(page_title="Exame de Matematica-I & Fisica-I UEM 2025", layout="centered")
 
 # Título Principal da Aplicação
-st.title("📝 Exame Unificado UEM 2025")
+st.title("📝 Exame de Matematica-I & Fisica-I UEM 2025")
 
 # Estilo para o Relógio Digital
 st.markdown("""
