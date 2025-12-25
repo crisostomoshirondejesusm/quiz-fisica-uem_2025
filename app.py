@@ -1,107 +1,141 @@
 import streamlit as st
 import time
-import streamlit.components.v1 as components
 
 # ======================================================
-# 1. CONFIGURAÇÃO DA PÁGINA
+# CONFIGURAÇÃO DA PÁGINA
 # ======================================================
 st.set_page_config(
-    page_title="Simulado de Física UEM 2025",
+    page_title="Simulado de Física – UEM 2025",
     layout="centered"
 )
 
 # ======================================================
-# 2. BANCO DE QUESTÕES (41–80)
+# BANCO DE QUESTÕES (EXEMPLO)
 # ======================================================
-if "perguntas" not in st.session_state:
-    st.session_state.perguntas = [
-        {"id": 41, "p": "Um recipiente de vidro está quase cheio com água em temperatura ambiente. Ao colocá-lo sobre uma chama de fogão, a água aquece por:", "opts": ["A. Condução", "B. Irradiação", "C. Convecção", "D. Condução e Convecção", "E. Convecção e Irradiação"], "c": "C"},
-        {"id": 42, "p": "Quais são as características que distinguem ondas electromagnéticas?", "opts": ["A. Intensidade e área", "B. Amplitude, frequência e comprimento de onda", "C. Timbre e altura", "D. Direcção apenas", "E. Perturbação"], "c": "B"},
-        {"id": 43, "p": "Um transmissor de rádio opera a 20 MHz. Qual é o comprimento de onda?", "opts": ["A. 15 m", "B. 25 m", "C. 35 m", "D. 45 m", "E. 55 m"], "c": "A"},
-        {"id": 44, "p": "Um corpo de massa 100 g recebeu 1250 cal ao ser aquecido de 30°C a 80°C. O calor específico é:", "opts": ["A. 0,025", "B. 2,5", "C. 25", "D. 12,5", "E. 0,25"], "c": "E"},
-        {"id": 45, "p": "Uma lâmpada incandescente tem temperatura 3000 K. O comprimento de onda máximo é:", "opts": ["A. 966 nm", "B. 765 nm", "C. 438 nm", "D. 350 nm", "E. 320 nm"], "c": "A"},
-        {"id": 46, "p": "O gráfico de Wien mostra corpos X, Y e Z. Qual é o menos quente?", "opts": ["A. Tx", "B. Ty", "C. Tz", "D. Tx = Ty", "E. Ty = Tz"], "c": "B"},
-        {"id": 47, "p": "Uma estrela tem potência 2,43×10²⁴ W. Qual a temperatura aproximada?", "opts": ["A. 19000 K", "B. 24000 K", "C. 28000 K", "D. 30000 K", "E. 34000 K"], "c": "A"},
-        {"id": 48, "p": "Energia de um fotão de raio X com comprimento de onda 1,0×10⁻¹⁰ m:", "opts": ["A. 5,99×10⁻¹⁵ J", "B. 4,99×10⁻¹⁵ J", "C. 3,99×10⁻¹⁵ J", "D. 2,99×10⁻¹⁵ J", "E. 1,99×10⁻¹⁵ J"], "c": "E"},
-        {"id": 49, "p": "Energia absorvida por um átomo ao absorver um quantum de 198,6 nm:", "opts": ["A. 0,25×10⁻¹⁸ J", "B. 0,5×10⁻¹⁸ J", "C. 1×10⁻¹⁸ J", "D. 2×10⁻¹⁸ J", "E. 3×10⁻¹⁸ J"], "c": "C"},
-        {"id": 50, "p": "O efeito fotoelétrico ocorre devido à interação entre:", "opts": ["A. Protões e eletrões", "B. Fotões e eletrões", "C. Eletrões", "D. Fotões", "E. Protões"], "c": "B"},
-    ]
+QUESTOES = [
+    {
+        "id": 46,
+        "pergunta": "O gráfico da lei do deslocamento de Wien mostra três corpos X, Y e Z. Qual deles tem menor temperatura?",
+        "opcoes": ["A. X", "B. Y", "C. Z", "D. X = Y", "E. Y = Z"],
+        "correta": "B"
+    },
+    {
+        "id": 47,
+        "pergunta": "Uma estrela irradia potência de 2,43×10²⁴ W. Qual a temperatura aproximada?",
+        "opcoes": ["A. 19000 K", "B. 24000 K", "C. 28000 K", "D. 30000 K", "E. 34000 K"],
+        "correta": "A"
+    },
+]
 
 # ======================================================
-# 3. FUNÇÃO DE RESET
+# FUNÇÃO RESET
 # ======================================================
-def reiniciar_exame():
+def reset():
     st.session_state.clear()
     st.rerun()
 
 # ======================================================
-# 4. ESTADOS
+# ESTADOS
 # ======================================================
 if "i" not in st.session_state:
     st.session_state.i = 0
+
 if "respostas" not in st.session_state:
     st.session_state.respostas = {}
+
+if "inicio_total" not in st.session_state:
+    st.session_state.inicio_total = time.time()
+
+if "inicio_questao" not in st.session_state:
+    st.session_state.inicio_questao = time.time()
+
 if "fim" not in st.session_state:
     st.session_state.fim = False
-if "inicio" not in st.session_state:
-    st.session_state.inicio = time.time()
 
 # ======================================================
-# 5. INTERFACE
+# TEMPOS
 # ======================================================
-st.title("⚖️ Simulado de Física – UEM 2025")
+TEMPO_TOTAL = 90 * 60      # 90 minutos
+TEMPO_QUESTAO = 30         # 30 segundos por questão
 
-TEMPO_TOTAL = 90 * 60  # 90 minutos
-tempo_restante = max(0, TEMPO_TOTAL - int(time.time() - st.session_state.inicio))
-st.metric("⏳ Tempo Restante", f"{tempo_restante//60}m {tempo_restante%60}s")
+tempo_total_restante = max(
+    0, TEMPO_TOTAL - int(time.time() - st.session_state.inicio_total)
+)
+
+tempo_q_restante = max(
+    0, TEMPO_QUESTAO - int(time.time() - st.session_state.inicio_questao)
+)
+
+# ======================================================
+# CABEÇALHO
+# ======================================================
+st.title("🧪 Simulado de Física – UEM 2025")
+
+st.info(f"⏳ Tempo total restante: {tempo_total_restante//60}m {tempo_total_restante%60}s")
+st.warning(f"⏱️ Tempo desta questão: {tempo_q_restante}s")
+
 st.divider()
 
 # ======================================================
-# 6. QUIZ
+# FIM AUTOMÁTICO
+# ======================================================
+if tempo_total_restante <= 0:
+    st.session_state.fim = True
+
+# ======================================================
+# QUIZ
 # ======================================================
 if not st.session_state.fim:
 
-    q = st.session_state.perguntas[st.session_state.i]
+    q = QUESTOES[st.session_state.i]
+
     st.subheader(f"Questão {q['id']}")
 
-    escolha = st.radio(
-        q["p"],
-        q["opts"],
+    resposta = st.radio(
+        q["pergunta"],
+        q["opcoes"],
         key=f"q_{st.session_state.i}"
     )
 
-    col1, col2 = st.columns(2)
+    # ⏱️ ESTOURO DO TEMPO DA QUESTÃO
+    if tempo_q_restante <= 0:
+        st.session_state.respostas[st.session_state.i] = "Sem resposta"
+        st.session_state.i += 1
+        st.session_state.inicio_questao = time.time()
+        st.rerun()
+
+    col1, col2, col3 = st.columns(3)
 
     if col1.button("⬅️ Anterior", disabled=st.session_state.i == 0):
         st.session_state.i -= 1
+        st.session_state.inicio_questao = time.time()
         st.rerun()
 
-    if col2.button("➡️ Próxima"):
-        st.session_state.respostas[st.session_state.i] = escolha[0]
-        if st.session_state.i == len(st.session_state.perguntas) - 1:
-            st.session_state.fim = True
-        else:
-            st.session_state.i += 1
+    if col2.button("💾 Guardar"):
+        st.session_state.respostas[st.session_state.i] = resposta[0]
+        st.success("Resposta guardada")
+
+    if col3.button("➡️ Próxima"):
+        st.session_state.respostas[st.session_state.i] = resposta[0]
+        st.session_state.i += 1
+        st.session_state.inicio_questao = time.time()
         st.rerun()
 
 # ======================================================
-# 7. RESULTADOS
+# RESULTADOS
 # ======================================================
 else:
-    st.success("🎯 Fim do Simulado!")
+    st.success("🎉 Fim do Simulado!")
 
     acertos = sum(
-        1 for i, q in enumerate(st.session_state.perguntas)
-        if st.session_state.respostas.get(i) == q["c"]
+        1 for i, q in enumerate(QUESTOES)
+        if st.session_state.respostas.get(i) == q["correta"]
     )
 
-    nota = (acertos / len(st.session_state.perguntas)) * 20
+    nota = (acertos / len(QUESTOES)) * 20
 
-    st.metric("Total de Acertos", f"{acertos} / {len(st.session_state.perguntas)}")
-    st.metric("Nota Final", f"{nota:.1f} / 20")
+    st.metric("✔️ Acertos", acertos)
+    st.metric("📊 Nota", f"{nota:.1f} / 20")
 
-    if st.button("📄 Imprimir / Guardar PDF"):
-        components.html("<script>window.print()</script>", height=0)
-
-    if st.button("🔄 Refazer Exame"):
-        reiniciar_exame()
+    if st.button("🔄 Refazer"):
+        reset()
